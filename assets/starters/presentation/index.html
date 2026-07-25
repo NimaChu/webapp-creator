@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d6552'/%3E%3C/svg%3E">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --bg: #f2efe7; --ink: #18201c; --muted: #667068; --accent: #1d6552;
+      --line: #cfd4cc; --surface: #fffdf8;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; overflow: hidden; background: var(--bg); color: var(--ink); }
+    main { height: 100%; }
+    .slide {
+      display: none; width: 100%; height: 100%; padding: clamp(36px, 7vw, 100px);
+      background: var(--surface);
+    }
+    .slide.active { display: grid; align-content: center; }
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; }
+    h1, h2 { max-width: 14ch; margin: 0; font-family: "Songti SC", "Noto Serif CJK SC", Georgia, "Times New Roman", serif; font-weight: 600; line-height: 1.04; }
+    h1 { font-size: clamp(2.5rem, 8vw, 6.5rem); }
+    h2 { font-size: clamp(2rem, 6vw, 4.8rem); }
+    .lead { max-width: 60ch; margin: 24px 0 0; color: var(--muted); font-size: clamp(1rem, 2vw, 1.45rem); line-height: 1.55; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 34px; }
+    .item { padding: 22px; border-top: 4px solid var(--accent); background: #f4f5f0; }
+    .item strong { display: block; font-size: 1.1rem; }
+    .item p { margin: 10px 0 0; color: var(--muted); line-height: 1.5; }
+    .quote { max-width: 22ch; font-family: "Songti SC", "Noto Serif CJK SC", Georgia, serif; font-size: clamp(2rem, 5vw, 4.2rem); line-height: 1.15; }
+    .controls {
+      position: fixed; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 7px;
+      padding: 7px; border: 1px solid var(--line); background: rgba(255, 253, 248, 0.94);
+    }
+    button { min-width: 42px; min-height: 42px; border: 1px solid var(--line); background: #fff; color: inherit; font: inherit; font-weight: 800; cursor: pointer; }
+    button:focus-visible { outline: 3px solid rgba(24, 104, 173, 0.3); outline-offset: 2px; }
+    #count { min-width: 62px; color: var(--muted); text-align: center; font-size: 0.85rem; }
+    @media (max-width: 680px) {
+      .slide { padding: 28px 22px 86px; }
+      .grid { grid-template-columns: 1fr; gap: 10px; }
+      .item { padding: 14px; }
+    }
+    @media print {
+      html, body { height: auto; overflow: visible; background: #fff; }
+      .slide, .slide.active { display: grid; width: 100%; height: 100vh; break-after: page; }
+      .controls { display: none; }
+    }
+  </style>
+</head>
+<body data-webapp-kind="__KIND__" data-ai-capabilities="__AI_CAPABILITIES__">
+  <main>
+    <section class="slide active">
+      <p class="eyebrow">主题概览</p>
+      <h1>__TITLE__</h1>
+      <p class="lead">__SUMMARY__</p>
+    </section>
+    <section class="slide">
+      <p class="eyebrow">关键结构</p>
+      <h2>让内容围绕决策展开</h2>
+      <div class="grid">
+        <article class="item"><strong>现状</strong><p>用具体事实建立共同背景。</p></article>
+        <article class="item"><strong>判断</strong><p>解释为什么现在需要行动。</p></article>
+        <article class="item"><strong>下一步</strong><p>给出负责人、动作和完成信号。</p></article>
+      </div>
+    </section>
+    <section class="slide">
+      <p class="eyebrow">结论</p>
+      <p class="quote">把最重要的一句话留在最后一屏。</p>
+      <p class="lead">使用方向键、Page Up/Down 或屏幕控制浏览；打印时每页输出一张。</p>
+    </section>
+  </main>
+  <nav class="controls" aria-label="演示控制">
+    <button id="previousButton" type="button" aria-label="上一页">←</button>
+    <span id="count" aria-live="polite">1 / 3</span>
+    <button id="nextButton" type="button" aria-label="下一页">→</button>
+  </nav>
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const count = document.querySelector('#count');
+    let index = 0;
+
+    function show(next) {
+      index = Math.max(0, Math.min(slides.length - 1, next));
+      slides.forEach((slide, slideIndex) => {
+        const active = slideIndex === index;
+        slide.classList.toggle('active', active);
+        slide.setAttribute('aria-hidden', String(!active));
+      });
+      count.textContent = `${index + 1} / ${slides.length}`;
+      history.replaceState(null, '', `#${index + 1}`);
+    }
+
+    document.querySelector('#previousButton').addEventListener('click', () => show(index - 1));
+    document.querySelector('#nextButton').addEventListener('click', () => show(index + 1));
+    window.addEventListener('keydown', event => {
+      if (['ArrowRight', 'PageDown', ' '].includes(event.key)) {
+        event.preventDefault();
+        show(index + 1);
+      }
+      if (['ArrowLeft', 'PageUp'].includes(event.key)) {
+        event.preventDefault();
+        show(index - 1);
+      }
+      if (event.key === 'Home') show(0);
+      if (event.key === 'End') show(slides.length - 1);
+    });
+    const hashIndex = Number(location.hash.slice(1)) - 1;
+    show(Number.isInteger(hashIndex) ? hashIndex : 0);
+  </script>
+</body>
+</html>

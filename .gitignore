@@ -1,3 +1,6 @@
 .DS_Store
+.playwright-cli/
 __pycache__/
 *.pyc
+.webapp.local.json
+dist/

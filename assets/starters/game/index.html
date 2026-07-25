@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2360d6ad'/%3E%3C/svg%3E">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1420; --surface: #181f2d; --line: #334056; --text: #f1f5fb;
+      --muted: #9da9ba; --accent: #60d6ad; --accent-2: #79a7ff; --danger: #ff7a75;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; background: var(--bg); color: var(--text); }
+    main { width: min(960px, calc(100% - 24px)); margin: 0 auto; padding: 20px 0 32px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
+    h1 { margin: 0; font-size: clamp(1.45rem, 4vw, 2.25rem); }
+    .summary { max-width: 56ch; margin: 6px 0 0; color: var(--muted); }
+    .scores { display: flex; gap: 8px; }
+    .score { min-width: 92px; padding: 9px 12px; border: 1px solid var(--line); background: var(--surface); text-align: center; }
+    .score span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
+    .score strong { display: block; margin-top: 3px; font-size: 1.25rem; }
+    .stage { position: relative; overflow: hidden; border: 1px solid var(--line); background: #111827; }
+    canvas { display: block; width: 100%; height: min(62vh, 560px); touch-action: none; }
+    .overlay {
+      position: absolute; inset: 0; display: grid; place-items: center; padding: 20px;
+      background: rgba(10, 14, 23, 0.82); text-align: center;
+    }
+    .overlay[hidden] { display: none; }
+    .dialog { width: min(420px, 100%); padding: 24px; border: 1px solid var(--line); background: var(--surface); }
+    .dialog h2 { margin: 0; font-size: 1.45rem; }
+    .dialog p { margin: 9px 0 18px; color: var(--muted); line-height: 1.5; }
+    .result { color: var(--accent); font-size: 1.1rem; font-weight: 800; }
+    button {
+      min-height: 44px; padding: 0 18px; border: 1px solid var(--accent); border-radius: 6px;
+      background: var(--accent); color: #07130f; font: inherit; font-weight: 800; cursor: pointer;
+    }
+    button:focus-visible, canvas:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+    .controls { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 0.85rem; }
+    kbd { padding: 2px 6px; border: 1px solid var(--line); border-bottom-width: 2px; background: var(--surface); color: var(--text); }
+    @media (max-width: 640px) {
+      main { width: min(100% - 16px, 600px); padding-top: 12px; }
+      header { align-items: start; flex-direction: column; }
+      .scores { width: 100%; }
+      .score { flex: 1; }
+      canvas { height: min(64vh, 560px); }
+      .controls { flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-webapp-kind="__KIND__" data-ai-capabilities="__AI_CAPABILITIES__">
+  <main>
+    <header>
+      <div>
+        <h1>__TITLE__</h1>
+        <p class="summary">__SUMMARY__</p>
+      </div>
+      <div class="scores" aria-label="得分">
+        <div class="score"><span>当前</span><strong id="score">0</strong></div>
+        <div class="score"><span>最佳</span><strong id="best">0</strong></div>
+      </div>
+    </header>
+    <section class="stage">
+      <canvas id="game" width="900" height="540" tabindex="0" aria-label="游戏区域"></canvas>
+      <div class="overlay" id="overlay">
+        <div class="dialog">
+          <h2 id="dialogTitle">准备开始</h2>
+          <p id="dialogText">移动挡板接住绿色光点，避开红色光点。坚持 30 秒。</p>
+          <p class="result" id="result" aria-live="polite"></p>
+          <button id="startButton" type="button">开始游戏</button>
+        </div>
+      </div>
+    </section>
+    <div class="controls">
+      <span>键盘：<kbd>←</kbd> <kbd>→</kbd> 或 <kbd>A</kbd> <kbd>D</kbd></span>
+      <span>触控：在游戏区域拖动挡板</span>
+    </div>
+  </main>
+  <script>
+    const canvas = document.querySelector('#game');
+    const context = canvas.getContext('2d');
+    const scoreNode = document.querySelector('#score');
+    const bestNode = document.querySelector('#best');
+    const overlay = document.querySelector('#overlay');
+    const startButton = document.querySelector('#startButton');
+    const dialogTitle = document.querySelector('#dialogTitle');
+    const dialogText = document.querySelector('#dialogText');
+    const resultNode = document.querySelector('#result');
+    const storageKey = 'webapp-game-best';
+    let best = Number(localStorage.getItem(storageKey) || 0);
+    let running = false;
+    let score = 0;
+    let remaining = 30;
+    let lastTime = 0;
+    let spawnTimer = 0;
+    let player = { x: 390, y: 490, width: 120, height: 16, speed: 460 };
+    let objects = [];
+    const keys = new Set();
+    bestNode.textContent = best;
+
+    function reset() {
+      score = 0;
+      remaining = 30;
+      spawnTimer = 0;
+      player.x = (canvas.width - player.width) / 2;
+      objects = [];
+      scoreNode.textContent = '0';
+      resultNode.textContent = '';
+    }
+
+    function start() {
+      reset();
+      running = true;
+      overlay.hidden = true;
+      startButton.textContent = '重新开始';
+      canvas.focus();
+      lastTime = performance.now();
+      requestAnimationFrame(frame);
+    }
+
+    function endGame(reason) {
+      running = false;
+      best = Math.max(best, score);
+      localStorage.setItem(storageKey, String(best));
+      bestNode.textContent = best;
+      dialogTitle.textContent = 'Game Over · 本轮结束';
+      dialogText.textContent = reason;
+      resultNode.textContent = `本轮得分 ${score} · 最佳 ${best}`;
+      startButton.textContent = '重新开始';
+      overlay.hidden = false;
+    }
+
+    function spawn() {
+      const harmful = Math.random() < 0.28;
+      objects.push({
+        x: 22 + Math.random() * (canvas.width - 44),
+        y: -20,
+        radius: harmful ? 12 : 10,
+        speed: 180 + Math.random() * 130,
+        harmful
+      });
+    }
+
+    function update(delta) {
+      remaining -= delta;
+      spawnTimer -= delta;
+      if (spawnTimer <= 0) {
+        spawn();
+        spawnTimer = Math.max(0.22, 0.58 - score * 0.006);
+      }
+      if (keys.has('arrowleft') || keys.has('a')) player.x -= player.speed * delta;
+      if (keys.has('arrowright') || keys.has('d')) player.x += player.speed * delta;
+      player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+      objects.forEach(object => object.y += object.speed * delta);
+      objects = objects.filter(object => {
+        const hit = object.y + object.radius >= player.y &&
+          object.y - object.radius <= player.y + player.height &&
+          object.x >= player.x && object.x <= player.x + player.width;
+        if (hit) {
+          if (object.harmful) {
+            endGame('碰到了红色光点。再试一次，争取刷新最佳成绩。');
+          } else {
+            score += 1;
+            scoreNode.textContent = score;
+          }
+          return false;
+        }
+        return object.y < canvas.height + 30;
+      });
+      if (remaining <= 0 && running) endGame('完成 30 秒挑战。');
+    }
+
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#111827';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.strokeStyle = '#253047';
+      context.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 60) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, canvas.height);
+        context.stroke();
+      }
+      context.fillStyle = '#60d6ad';
+      context.fillRect(player.x, player.y, player.width, player.height);
+      objects.forEach(object => {
+        context.beginPath();
+        context.fillStyle = object.harmful ? '#ff7a75' : '#60d6ad';
+        context.arc(object.x, object.y, object.radius, 0, Math.PI * 2);
+        context.fill();
+      });
+      context.fillStyle = '#d9e2ef';
+      context.font = '700 22px system-ui';
+      context.fillText(`${Math.max(0, remaining).toFixed(1)}s`, 20, 34);
+    }
+
+    function frame(now) {
+      if (!running) {
+        draw();
+        return;
+      }
+      const delta = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
+      update(delta);
+      draw();
+      if (running) requestAnimationFrame(frame);
+    }
+
+    function moveFromPointer(event) {
+      const bounds = canvas.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) * (canvas.width / bounds.width);
+      player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
+    }
+
+    startButton.addEventListener('click', start);
+    canvas.addEventListener('pointerdown', event => {
+      canvas.setPointerCapture(event.pointerId);
+      moveFromPointer(event);
+    });
+    canvas.addEventListener('pointermove', event => {
+      if (canvas.hasPointerCapture(event.pointerId)) moveFromPointer(event);
+    });
+    window.addEventListener('keydown', event => {
+      const key = event.key.toLowerCase();
+      if (['arrowleft', 'arrowright', 'a', 'd'].includes(key)) {
+        event.preventDefault();
+        keys.add(key);
+      }
+    });
+    window.addEventListener('keyup', event => keys.delete(event.key.toLowerCase()));
+    draw();
+  </script>
+</body>
+</html>

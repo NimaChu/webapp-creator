@@ -209,17 +209,17 @@ def infer_art_direction(template_name: str, slug: str, hint_text: str = "") -> s
     return DEFAULT_TEMPLATE_MOTIFS.get(template_name, "arcade-orbit")
 
 
-def pick_palette_for_manifest(manifest: dict, motif: str) -> dict[str, tuple[int, int, int]]:
+def pick_palette_for_metadata(metadata: dict, motif: str) -> dict[str, tuple[int, int, int]]:
     text = " ".join(
         [
-            str(manifest.get("category", "")).lower(),
-            str(manifest.get("modelCategory", "")).lower(),
-            str(manifest.get("name", "")).lower(),
-            str(manifest.get("description", "")).lower(),
-            " ".join(str(item).lower() for item in manifest.get("tags", [])),
+            str(metadata.get("kind", "")).lower(),
+            str(metadata.get("capabilities", "")).lower(),
+            str(metadata.get("title", "")).lower(),
+            str(metadata.get("summary", "")).lower(),
+            " ".join(str(item).lower() for item in metadata.get("tags", [])),
         ]
     )
-    resolved_motif = infer_art_direction("generic", str(manifest.get("slug") or manifest.get("id") or ""), text) if motif == "arcade-orbit" else motif
+    resolved_motif = infer_art_direction("generic", str(metadata.get("slug", "")), text) if motif == "arcade-orbit" else motif
     palette_key = MOTIF_TO_PALETTE.get(resolved_motif)
     if palette_key:
         return TEMPLATE_PALETTES[palette_key]
@@ -229,7 +229,7 @@ def pick_palette_for_manifest(manifest: dict, motif: str) -> dict[str, tuple[int
 
 
 def create_default_assets(assets_dir: Path, template_name: str, slug: str = "") -> tuple[str, str]:
-    thumbnail_path = assets_dir / "thumbnail.png"
+    thumbnail_path = assets_dir / "cover.png"
     icon_path = assets_dir / "icon.png"
     motif = infer_art_direction(template_name, slug)
     variant = choose_cover_variant(template_name, slug, motif)
@@ -238,7 +238,7 @@ def create_default_assets(assets_dir: Path, template_name: str, slug: str = "") 
     palette = vary_palette(base_palette, variant)
     create_thumbnail_png(thumbnail_path, palette, motif, variant, seed)
     create_icon_png(icon_path, palette, motif, variant, seed)
-    return "assets/thumbnail.png", "assets/icon.png"
+    return "assets/cover.png", "assets/icon.png"
 
 
 def _blend(a: tuple[int, int, int], b: tuple[int, int, int], factor: float) -> tuple[int, int, int]:
@@ -319,23 +319,6 @@ def write_png(path: Path, width: int, height: int, pixel_at) -> None:
         ]
     )
     path.write_bytes(png)
-
-
-def _draw_lobster_badge(base: tuple[int, int, int], x: int, y: int, width: int, height: int, variant: int) -> tuple[int, int, int]:
-    shell = (255, 112, 82)
-    cream = (255, 239, 229)
-    gold = (255, 196, 94)
-    cx = width * 0.14 + (variant - (COVER_VARIANT_COUNT / 2)) * 1.2
-    cy = height * 0.18
-    if _ellipse(x, y, cx, cy + height * 0.03, width * 0.045, height * 0.055):
-        return _mix(base, shell, 0.96)
-    if _ellipse(x, y, cx, cy - height * 0.035, width * 0.03, height * 0.035):
-        return _mix(base, shell, 0.98)
-    if _circle(x, y, cx - width * 0.022, cy - height * 0.08, 7) or _circle(x, y, cx + width * 0.022, cy - height * 0.08, 7):
-        return _mix(base, cream, 0.92)
-    if _distance_to_segment(x, y, cx + width * 0.045, cy + height * 0.01, cx + width * 0.09, cy - height * 0.025) < 5:
-        return _mix(base, gold, 0.9)
-    return base
 
 
 def create_thumbnail_png(path: Path, palette: dict[str, tuple[int, int, int]], motif: str, variant: int = 0, seed: int = 0) -> None:
@@ -478,7 +461,6 @@ def create_thumbnail_png(path: Path, palette: dict[str, tuple[int, int, int]], m
             if _distance_to_segment(x, y, width * (0.24 + seed_x * 0.16), height * (0.34 - seed_y * 0.12), width * (0.78 - seed_x * 0.14), height * (0.3 - seed_y * 0.1)) < 4:
                 base = _mix(base, secondary, 0.82)
 
-        base = _draw_lobster_badge(base, x, y, width, height, variant)
         return _rgba(base)
 
     write_png(path, width, height, pixel_at)
@@ -536,7 +518,6 @@ def create_icon_png(path: Path, palette: dict[str, tuple[int, int, int]], motif:
                 if _distance_to_segment(x, y, size * (0.34 + seed_x * 0.08), size * (0.4 + seed_y * 0.08), size * (0.66 - seed_x * 0.08), size * (0.6 - seed_y * 0.08)) < 10:
                     base = _mix(base, primary, 0.84)
 
-        base = _draw_lobster_badge(base, x, y, size, size, variant)
         return _rgba(base)
 
     write_png(path, size, size, pixel_at)
