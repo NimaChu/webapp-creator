@@ -4,9 +4,11 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import re
 import shutil
 import sys
+import tempfile
 import zipfile
 from html.parser import HTMLParser
 from pathlib import Path
@@ -36,15 +38,16 @@ SECRET_PATTERNS = [
 class Inspector(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
-        self.doctype = False
+        self.doctype_count = 0
         self.tags: list[str] = []
+        self.end_tags: list[str] = []
         self.attrs: list[tuple[str, dict[str, str]]] = []
         self.title_depth = 0
         self.title_parts: list[str] = []
 
     def handle_decl(self, decl: str) -> None:
         if decl.strip().lower() == "doctype html":
-            self.doctype = True
+            self.doctype_count += 1
 
     def handle_starttag(
         self, tag: str, attrs: list[tuple[str, str | None]]
@@ -57,7 +60,9 @@ class Inspector(HTMLParser):
             self.title_depth += 1
 
     def handle_endtag(self, tag: str) -> None:
-        if tag.lower() == "title" and self.title_depth:
+        tag = tag.lower()
+        self.end_tags.append(tag)
+        if tag == "title" and self.title_depth:
             self.title_depth -= 1
 
     def handle_data(self, data: str) -> None:
@@ -159,9 +164,22 @@ def inspect_html(path: Path) -> tuple[list[str], list[str]]:
     tags = inspector.tags
     attrs = inspector.attrs
 
-    if not inspector.doctype:
+    if inspector.doctype_count == 0:
         errors.append("Missing <!doctype html>")
+    elif inspector.doctype_count > 1:
+        errors.append("Document must contain exactly one <!doctype html>")
     html_nodes = [values for tag, values in attrs if tag == "html"]
+    if len(html_nodes) != 1:
+        errors.append("Document must contain exactly one <html> root element")
+    if inspector.end_tags.count("html") != 1:
+        errors.append("Document must contain exactly one closing </html> tag")
+    body_nodes = [values for tag, values in attrs if tag == "body"]
+    if len(body_nodes) != 1 or inspector.end_tags.count("body") != 1:
+        errors.append("Document must contain one complete <body> element")
+    if not re.match(r"^\s*<!doctype\s+html\b", source, re.I):
+        errors.append("HTML must begin with <!doctype html>")
+    if re.search(r"^\s*```", source):
+        errors.append("Markdown fences must not wrap delivered HTML")
     if not html_nodes or not html_nodes[0].get("lang"):
         errors.append("Set a language on the <html> element")
     if not any(tag == "meta" and values.get("charset") for tag, values in attrs):
@@ -297,12 +315,13 @@ def serve(args: argparse.Namespace) -> None:
         host=args.host,
         port=args.port,
         open_browser=args.open,
+        allowed_hosts=args.allow_host,
     )
 
 
-def _include_in_build(path: Path, root: Path, output: Path) -> bool:
+def _include_in_build(path: Path, root: Path, excluded: set[Path]) -> bool:
     resolved = path.resolve()
-    if resolved == output:
+    if resolved in excluded:
         return False
     relative = path.relative_to(root)
     ignored_parts = {".git", "__pycache__", "dist"}
@@ -327,11 +346,32 @@ def build(args: argparse.Namespace) -> None:
         if args.out
         else project.parent / f"{project.name}.zip"
     )
+    if output.exists() and not args.force:
+        raise SystemExit(f"Output already exists: {output}. Use --force to replace it.")
+    if output.exists() and not output.is_file():
+        raise SystemExit(f"Build output is not a file: {output}")
     output.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path in sorted(project.rglob("*")):
-            if path.is_file() and _include_in_build(path, project, output):
-                archive.write(path, path.relative_to(project).as_posix())
+    temporary_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix=f".{output.name}.",
+            suffix=".tmp",
+            dir=output.parent,
+            delete=False,
+        ) as temporary:
+            temporary_path = Path(temporary.name)
+        excluded = {output.resolve(), temporary_path.resolve()}
+        with zipfile.ZipFile(
+            temporary_path, "w", compression=zipfile.ZIP_DEFLATED
+        ) as archive:
+            for path in sorted(project.rglob("*")):
+                if path.is_file() and _include_in_build(path, project, excluded):
+                    archive.write(path, path.relative_to(project).as_posix())
+        os.replace(temporary_path, output)
+        temporary_path = None
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
     print(f"Built: {output}")
 
 
@@ -380,6 +420,12 @@ def parser() -> argparse.ArgumentParser:
     preview.add_argument("project")
     preview.add_argument("--config")
     preview.add_argument("--host", default="127.0.0.1")
+    preview.add_argument(
+        "--allow-host",
+        action="append",
+        default=[],
+        help="Additional accepted Host header. Repeat for more than one host.",
+    )
     preview.add_argument("--port", type=int, default=4327)
     preview.add_argument("--open", action="store_true")
     preview.set_defaults(func=serve)
@@ -388,6 +434,9 @@ def parser() -> argparse.ArgumentParser:
     package.add_argument("project")
     package.add_argument("--out")
     package.add_argument("--allow-warnings", action="store_true")
+    package.add_argument(
+        "--force", action="store_true", help="Replace an existing output archive."
+    )
     package.set_defaults(func=build)
 
     kinds = commands.add_parser("kinds", help="List supported app kinds.")

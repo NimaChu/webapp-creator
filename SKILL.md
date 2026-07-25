@@ -37,12 +37,13 @@ For games, also read [references/games.md](references/games.md). For presentatio
 1. Inspect the audience, environment, core task, inputs, outputs, data sensitivity, and required states.
 2. Write a compact product contract and choose one visual direction.
 3. Preserve working domain logic when modifying an existing app.
-4. Scaffold only when no useful implementation exists.
-5. Replace starter content and behavior with the actual task.
-6. Implement empty, ready, working, success, partial, error, and reset states where relevant.
-7. Validate with `scripts/webapp.py validate --strict`.
-8. Run the primary workflow in a real browser at desktop, narrow mobile, and 320 px widths.
-9. Build a zip only when the user needs a distributable package.
+4. Preserve all decision-relevant user content; do not invent data, metrics, or conclusions.
+5. Scaffold only when no useful implementation exists.
+6. Replace starter content and behavior with the actual task.
+7. Implement empty, ready, working, success, partial, error, and reset states where relevant.
+8. Validate with `scripts/webapp.py validate --strict`.
+9. Run the primary workflow in a real browser at desktop, narrow mobile, and 320 px widths.
+10. Build a zip only when the user needs a distributable package.
 
 ## Scaffold
 
@@ -108,11 +109,18 @@ Run:
 python3 scripts/webapp.py validate <html-file-or-folder>
 python3 scripts/webapp.py validate <html-file-or-folder> --strict
 python3 scripts/webapp.py build <folder> --out <app.zip>
+python3 scripts/webapp.py build <folder> --out <app.zip> --force
 ```
 
 Treat strict static validation as the quality floor, not visual proof. Test real inputs, invalid inputs, reset, copy/download, persistence, asynchronous failure, and keyboard navigation as applicable.
 
-The build command excludes `.webapp.local.json`, Git data, caches, existing zip files, and development output.
+The build command refuses to overwrite an existing archive unless `--force` is explicit. It excludes `.webapp.local.json`, Git data, caches, existing zip files, and development output.
+
+Run the repository self-check after changing this skill, its scripts, or its starters:
+
+```bash
+python3 scripts/check_skill.py
+```
 
 ## Optional Cover Assets
 

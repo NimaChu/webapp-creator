@@ -19,6 +19,11 @@ Use one self-contained HTML file when browser APIs and modest JavaScript are suf
 
 ## Compose The Interface
 
+Preserve the user's information hierarchy and all decision-relevant content. Let the
+amount of real content determine the number of sections, cards, steps, or slides.
+Never manufacture measurements, trends, testimonials, citations, or conclusions.
+Clearly label intentional demonstration data as sample data.
+
 For tools:
 
 1. Use a compact literal title and one-line purpose.
@@ -33,6 +38,7 @@ For data views:
 2. Show comparison context and units.
 3. Use charts for shape and tables for precise lookup.
 4. Surface exceptions before decoration.
+5. Give every chart an explicit responsive height or `min-height`; do not rely on an unconstrained parent.
 
 Avoid marketing-style hero sections, decorative feature grids, and controls without working behavior.
 
@@ -55,6 +61,13 @@ Avoid marketing-style hero sections, decorative feature grids, and controls with
 - Give canvases and charts stable responsive dimensions.
 - Keep the main action visible early on mobile.
 - Ensure the longest control label fits at 320 px.
+
+## Typography And Contrast
+
+- For Chinese interfaces, use a local CJK-first stack such as `"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif`.
+- Use local system fonts by default; do not make legibility depend on a font download.
+- Keep normal text and essential control text at a contrast ratio of at least 4.5:1.
+- Do not use color alone to communicate state, category, or validation.
 
 ## Existing Apps
 

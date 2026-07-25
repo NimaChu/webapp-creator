@@ -37,10 +37,15 @@ const response = await fetch('/runtime/ai/chat', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     messages: [{ role: 'user', content: input }],
-    temperature: 0.4
+    temperature: 0.4,
+    stream: true
   })
 })
 ```
+
+For streaming chat responses, parse OpenAI-compatible `text/event-stream`
+events incrementally, stop at `data: [DONE]`, and retain a JSON response
+fallback for compatible servers that ignore `stream`.
 
 Image generation:
 
@@ -73,3 +78,14 @@ python3 scripts/webapp.py serve <project> --open
 ```
 
 Bind to `127.0.0.1` by default. Bind to another interface only when the user intentionally needs local-network access.
+The runtime accepts only `localhost`, `127.0.0.1`, and `::1` Host headers by
+default to resist DNS rebinding. For intentional local-network access, add each
+exact hostname or address explicitly:
+
+```bash
+python3 scripts/webapp.py serve <project> \
+  --host 0.0.0.0 \
+  --allow-host <trusted-lan-hostname-or-address>
+```
+
+Never add `0.0.0.0` as an allowed Host header.

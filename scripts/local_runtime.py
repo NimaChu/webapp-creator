@@ -12,12 +12,13 @@ import webbrowser
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
-from urllib.parse import urlparse
+from typing import Any, Collection
+from urllib.parse import urlparse, urlsplit
 
 
 MAX_REQUEST_BYTES = 24 * 1024 * 1024
 DEFAULT_CONFIG_NAME = ".webapp.local.json"
+DEFAULT_ALLOWED_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
 
 
 def _json_bytes(value: object) -> bytes:
@@ -73,6 +74,32 @@ def _endpoint(profile: dict[str, Any], suffix: str) -> str:
     return f"{base_url}/{suffix.lstrip('/')}"
 
 
+def _normalize_host_header(value: str) -> str | None:
+    value = value.strip()
+    if not value or any(character in value for character in "\r\n"):
+        return None
+    try:
+        parsed = urlsplit(f"//{value}")
+        parsed.port
+    except ValueError:
+        return None
+    if (
+        parsed.username is not None
+        or parsed.password is not None
+        or parsed.path
+        or parsed.query
+        or parsed.fragment
+    ):
+        return None
+    hostname = parsed.hostname
+    return hostname.lower().rstrip(".") if hostname else None
+
+
+def _host_is_allowed(value: str, allowed_hosts: Collection[str]) -> bool:
+    hostname = _normalize_host_header(value)
+    return hostname is not None and hostname in allowed_hosts
+
+
 class RuntimeHandler(SimpleHTTPRequestHandler):
     server_version = "WebAppLocalRuntime/1.0"
 
@@ -81,9 +108,11 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
         *args: object,
         directory: str,
         runtime_config: dict[str, Any],
+        allowed_hosts: Collection[str],
         **kwargs: object,
     ) -> None:
         self.runtime_config = runtime_config
+        self.allowed_hosts = frozenset(allowed_hosts)
         super().__init__(*args, directory=directory, **kwargs)
 
     def log_message(self, format: str, *args: object) -> None:
@@ -91,7 +120,22 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
         if "/runtime/ai/" not in message:
             super().log_message("%s", message)
 
+    def _validate_host(self) -> bool:
+        if _host_is_allowed(self.headers.get("Host", ""), self.allowed_hosts):
+            return True
+        self._send_json(
+            421,
+            {
+                "error": (
+                    "Host header rejected. Use localhost or an explicitly allowed host."
+                )
+            },
+        )
+        return False
+
     def do_GET(self) -> None:
+        if not self._validate_host():
+            return
         if self.path.split("?", 1)[0] == "/runtime/health":
             chat = _profile(self.runtime_config, "chat")
             image = _profile(self.runtime_config, "image")
@@ -112,7 +156,13 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             return
         super().do_GET()
 
+    def do_HEAD(self) -> None:
+        if self._validate_host():
+            super().do_HEAD()
+
     def do_POST(self) -> None:
+        if not self._validate_host():
+            return
         route = self.path.split("?", 1)[0]
         if route not in {"/runtime/ai/chat", "/runtime/ai/image"}:
             self._send_json(404, {"error": "Unknown runtime route."})
@@ -240,6 +290,7 @@ def run_server(
     host: str = "127.0.0.1",
     port: int = 4327,
     open_browser: bool = False,
+    allowed_hosts: Collection[str] = (),
 ) -> None:
     root = root.expanduser().resolve()
     if root.is_file():
@@ -257,10 +308,20 @@ def run_server(
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
 
+    normalized_allowed_hosts = set(DEFAULT_ALLOWED_HOSTS)
+    for value in allowed_hosts:
+        normalized = _normalize_host_header(value)
+        if normalized is None:
+            raise SystemExit(f"Invalid allowed host: {value}")
+        if normalized == "0.0.0.0":
+            raise SystemExit("0.0.0.0 cannot be used as an allowed Host header.")
+        normalized_allowed_hosts.add(normalized)
+
     handler = partial(
         RuntimeHandler,
         directory=str(root),
         runtime_config=config,
+        allowed_hosts=normalized_allowed_hosts,
     )
     selected_port = _available_port(host, port)
     server = ThreadingHTTPServer((host, selected_port), handler)
@@ -289,6 +350,12 @@ def main() -> None:
     parser.add_argument("project")
     parser.add_argument("--config")
     parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument(
+        "--allow-host",
+        action="append",
+        default=[],
+        help="Additional accepted Host header. Repeat for more than one host.",
+    )
     parser.add_argument("--port", type=int, default=4327)
     parser.add_argument("--open", action="store_true")
     args = parser.parse_args()
@@ -298,6 +365,7 @@ def main() -> None:
         host=args.host,
         port=args.port,
         open_browser=args.open,
+        allowed_hosts=args.allow_host,
     )
 
 
