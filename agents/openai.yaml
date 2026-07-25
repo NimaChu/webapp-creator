@@ -1,7 +1,4 @@
 interface:
-  display_name: "ClawApp Creator"
-  short_description: "打包并上传站点应用的工作流"
-  default_prompt: "Use $clawapp-creator to turn my app or mini-game into a Nima Tech Space package and upload it if possible."
-
-policy:
-  allow_implicit_invocation: true
+  display_name: "WebApp Creator"
+  short_description: "Create portable single-file HTML apps with optional local AI."
+  default_prompt: "Use $webapp-creator to build a polished standalone HTML app that runs locally."
