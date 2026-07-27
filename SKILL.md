@@ -1,9 +1,9 @@
 ---
-name: webapp-creator
+name: html-design
 description: Create, redesign, repair, validate, preview, and package lightweight standalone web apps as portable HTML. Use for single-file browser tools, calculators, converters, dashboards, guided workflows, knowledge interfaces, touch-friendly mini-games, full-screen HTML presentations, and local-model text, vision, image, or code tools that must run without a build chain or hosted service.
 ---
 
-# WebApp Creator
+# HTML Design
 
 Build the usable application, not a page that describes it. Default to one self-contained `index.html` with inline CSS and JavaScript. Keep the result inspectable, portable, and runnable from local storage.
 

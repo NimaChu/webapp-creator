@@ -34,13 +34,13 @@ def check_metadata() -> None:
         fields[key.strip()] = value.strip()
     if set(fields) != {"name", "description"}:
         raise AssertionError("Frontmatter must contain only name and description")
-    if fields["name"] != "webapp-creator":
-        raise AssertionError("Skill name must be webapp-creator")
+    if fields["name"] != "html-design":
+        raise AssertionError("Skill name must be html-design")
     if len(fields["description"]) < 80:
         raise AssertionError("Skill description is too short to trigger reliably")
 
     agent_source = (ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8")
-    for expected in ("display_name:", "short_description:", "$webapp-creator"):
+    for expected in ("display_name:", "short_description:", "$html-design"):
         if expected not in agent_source:
             raise AssertionError(f"agents/openai.yaml is missing {expected}")
 
