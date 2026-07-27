@@ -1,8 +1,8 @@
-# WebApp Creator
+# HTML Design
 
 用一句自然语言描述需求，创建可以独立运行的轻量网页应用。
 
-WebApp Creator 是一个面向 AI 编程助手的技能包。它默认把应用做成一个
+HTML Design 是一个面向 AI 编程助手的技能包。它默认把应用做成一个
 `index.html`：不用安装前端框架，不用运行构建命令，也不依赖某个发布平台。
 完成后可以直接在浏览器打开、放进 U 盘、发给别人，或者部署到任意静态网站服务。
 
@@ -39,8 +39,8 @@ OpenAI-compatible 接口；普通计算器、小游戏等应用完全不需要�
 以 Codex 为例，在终端执行：
 
 ```bash
-git clone https://github.com/NimaChu/webapp-creator.git \
-  ~/.codex/skills/webapp-creator
+git clone https://github.com/NimaChu/html-design.git \
+  ~/.codex/skills/html-design
 ```
 
 重新打开 Codex，让它发现新技能。
@@ -48,7 +48,7 @@ git clone https://github.com/NimaChu/webapp-creator.git \
 如果你已经下载了仓库，可以先运行自检：
 
 ```bash
-cd ~/.codex/skills/webapp-creator
+cd ~/.codex/skills/html-design
 python3 scripts/check_skill.py
 ```
 
@@ -58,15 +58,15 @@ python3 scripts/check_skill.py
 
 不需要先决定技术方案，像平时说话一样告诉 AI：
 
-> 使用 webapp-creator 做一个旅行费用分摊工具。支持多人、多币种，结果可以复制，手机也要好用。
+> 使用 html-design 做一个旅行费用分摊工具。支持多人、多币种，结果可以复制，手机也要好用。
 
 或者：
 
-> 使用 webapp-creator 做一个单词消除小游戏。保存最高分，触屏和键盘都能玩，最后交付一个 index.html。
+> 使用 html-design 做一个单词消除小游戏。保存最高分，触屏和键盘都能玩，最后交付一个 index.html。
 
 再比如本地 AI 工具：
 
-> 使用 webapp-creator 做一个本地文章改写工具，连接 OpenAI-compatible 模型，支持流式输出和取消生成。
+> 使用 html-design 做一个本地文章改写工具，连接 OpenAI-compatible 模型，支持流式输出和取消生成。
 
 AI 会根据需求选择合适的应用类型，完成界面、交互、验证和本地预览。
 
@@ -192,7 +192,7 @@ python3 scripts/webapp.py build <应用目录> --out <应用名>.zip --force
 ## 项目结构
 
 ```text
-webapp-creator/
+html-design/
 ├── SKILL.md                  # AI 使用的核心工作流
 ├── assets/starters/          # 六类应用与 AI 工具起点
 ├── references/               # 设计、游戏、演示和本地模型规范

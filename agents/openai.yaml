@@ -1,4 +1,4 @@
 interface:
-  display_name: "WebApp Creator"
+  display_name: "HTML Design"
   short_description: "Create portable single-file HTML apps with optional local AI."
-  default_prompt: "Use $webapp-creator to build a polished standalone HTML app that runs locally."
+  default_prompt: "Use $html-design to build a polished standalone HTML app that runs locally."
