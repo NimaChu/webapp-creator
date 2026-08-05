@@ -13,6 +13,8 @@ Before styling, write down:
 
 Infer reversible details and build the core workflow first. Ask only when an assumption changes data handling, security, or the fundamental interaction.
 
+For presentation aesthetics, prefer evidence over adjectives. If the subject, venue, and brand do not make the visual direction clear, render a small set of cover previews with the user's real title and purpose. Ask the user to react to visible alternatives, then carry the selected system through the full deck.
+
 ## Choose Complexity Deliberately
 
 Use one self-contained HTML file when browser APIs and modest JavaScript are sufficient. Split local CSS, JavaScript, or media only when the single file becomes difficult to maintain. Keep split projects static and dependency-light.
@@ -72,3 +74,5 @@ Avoid marketing-style hero sections, decorative feature grids, and controls with
 ## Existing Apps
 
 Preserve working domain behavior while improving structure and presentation. Test behavior before and after the change. Remove dead controls, placeholder data, debug output, and fake success states.
+
+For an existing branded presentation, identify the active brand pack, visual system, approved layouts, image slots, and stage mode before changing individual slides. Fix repeated problems in the pack or shared runtime rather than accumulating page-local overrides.

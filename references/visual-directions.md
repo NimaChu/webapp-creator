@@ -61,4 +61,6 @@ Before coding, specify:
 
 If the same design would fit an unrelated app after changing only the title, make the structure or signature more specific.
 
+For presentations, apply this contract after resolving the brand pack. Use the real-content styleboard only when the brand and subject still leave consequential visual ambiguity. See [presentations.md](presentations.md) for the editorial-evidence, international-grid, and subject-wildcard discovery paths.
+
 Avoid generic AI styling, decorative gradients, oversized rounding, nested cards, excessive centering, and animation without informational value.

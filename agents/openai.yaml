@@ -1,4 +1,4 @@
 interface:
   display_name: "HTML Design"
-  short_description: "Create portable single-file HTML apps with optional local AI."
-  default_prompt: "Use $html-design to build a polished standalone HTML app that runs locally."
+  short_description: "Build portable HTML apps, branded decks, and local-AI tools."
+  default_prompt: "Use $html-design to build a polished portable HTML app or branded presentation that runs locally."

@@ -59,6 +59,19 @@ def check_runtime_config() -> None:
         raise AssertionError("Local runtime example contains a credential-like field")
 
 
+def check_brand_packs() -> None:
+    brand_root = ROOT / "assets" / "brand-packs"
+    packs = sorted(brand_root.glob("*/brand.json"))
+    if len(packs) < 3:
+        raise AssertionError("Expected at least three reusable presentation brand packs")
+    for path in packs:
+        profile, resolved = webapp._load_brand(str(path))
+        if resolved != path.resolve():
+            raise AssertionError(f"Brand pack resolved unexpectedly: {path}")
+        if not profile.get("layouts"):
+            raise AssertionError(f"Brand pack has no layouts: {path}")
+
+
 def _scaffold(
     output: Path,
     *,
@@ -134,6 +147,7 @@ def main() -> None:
         ("metadata", check_metadata),
         ("Python sources", check_python_sources),
         ("runtime config", check_runtime_config),
+        ("brand packs", check_brand_packs),
         ("starters and build", check_starters_and_build),
         ("unit tests", check_tests),
     ]

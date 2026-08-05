@@ -1,6 +1,6 @@
 ---
 name: html-design
-description: Create, redesign, repair, validate, preview, and package lightweight standalone web apps as portable HTML. Use for single-file browser tools, calculators, converters, dashboards, guided workflows, knowledge interfaces, touch-friendly mini-games, full-screen HTML presentations, and local-model text, vision, image, or code tools that must run without a build chain or hosted service.
+description: Create, redesign, repair, validate, preview, and package lightweight standalone web apps as portable HTML. Use for single-file browser tools, calculators, converters, dashboards, guided workflows, knowledge interfaces, touch-friendly mini-games, full-screen HTML presentations, reusable presentation brand packs, and local-model text, vision, image, or code tools that must run without a build chain or hosted service.
 ---
 
 # HTML Design
@@ -38,12 +38,13 @@ For games, also read [references/games.md](references/games.md). For presentatio
 2. Write a compact product contract and choose one visual direction.
 3. Preserve working domain logic when modifying an existing app.
 4. Preserve all decision-relevant user content; do not invent data, metrics, or conclusions.
-5. Scaffold only when no useful implementation exists.
-6. Replace starter content and behavior with the actual task.
-7. Implement empty, ready, working, success, partial, error, and reset states where relevant.
-8. Validate with `scripts/webapp.py validate --strict`.
-9. Run the primary workflow in a real browser at desktop, narrow mobile, and 320 px widths.
-10. Build a zip only when the user needs a distributable package.
+5. For presentations, select an existing brand pack first. When no brand applies and visual ambiguity is consequential, generate three real-content style previews rather than asking for abstract adjectives.
+6. Scaffold only when no useful implementation exists.
+7. Replace starter content and behavior with the actual task.
+8. Implement empty, ready, working, success, partial, error, and reset states where relevant.
+9. Validate with `scripts/webapp.py validate --strict`.
+10. Run the primary workflow in a real browser at desktop, narrow mobile, and 320 px widths. For fixed-stage presentations, inspect the scaled composition rather than reflowing it.
+11. Build a zip only when the user needs a distributable package.
 
 ## Scaffold
 
@@ -63,6 +64,17 @@ python3 scripts/webapp.py scaffold \
   --summary "<purpose>"
 ```
 
+Create a branded presentation:
+
+```bash
+python3 scripts/webapp.py scaffold \
+  --kind presentation \
+  --brand <built-in-id-or-brand-pack-path> \
+  --out <folder> \
+  --title "<title>" \
+  --summary "<narrative purpose>"
+```
+
 Create a model-enabled app:
 
 ```bash
@@ -77,6 +89,20 @@ python3 scripts/webapp.py scaffold \
 Supported kinds are `tool`, `dashboard`, `guided`, `knowledge`, `game`, and `presentation`. Supported model capabilities are `none`, `text`, `vision`, `image`, and `code`.
 
 Do not scaffold over a non-empty directory. Treat starters as interaction engines, not finished themes or domain implementations.
+
+For presentation visual discovery, generate a temporary board with the actual title and purpose:
+
+```bash
+python3 scripts/webapp.py styleboard --out <folder> --title "<title>" --summary "<purpose>"
+```
+
+List reusable brand seeds with `python3 scripts/webapp.py brands`. Create a custom pack with:
+
+```bash
+python3 scripts/webapp.py brand-init --from neutral-corporate --out <brand-folder> --name "<brand name>"
+```
+
+Read [references/presentations.md](references/presentations.md) before editing a pack. Keep brand identity in `brand.json`, local logo assets, and optional `brand.css`; keep slide-specific overrides in the deck.
 
 ## Architecture Threshold
 
@@ -108,11 +134,12 @@ Run:
 ```bash
 python3 scripts/webapp.py validate <html-file-or-folder>
 python3 scripts/webapp.py validate <html-file-or-folder> --strict
+python3 scripts/webapp.py validate <presentation> --strict --rendered
 python3 scripts/webapp.py build <folder> --out <app.zip>
 python3 scripts/webapp.py build <folder> --out <app.zip> --force
 ```
 
-Treat strict static validation as the quality floor, not visual proof. Test real inputs, invalid inputs, reset, copy/download, persistence, asynchronous failure, and keyboard navigation as applicable.
+Treat strict static validation as the quality floor, not visual proof. Use rendered presentation validation when Playwright is available. Test real inputs, invalid inputs, reset, copy/download, persistence, asynchronous failure, and keyboard navigation as applicable.
 
 The build command refuses to overwrite an existing archive unless `--force` is explicit. It excludes `.webapp.local.json`, Git data, caches, existing zip files, and development output.
 
