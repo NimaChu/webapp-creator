@@ -46,3 +46,14 @@
 - Exercise the primary workflow in a real browser.
 - Remove placeholder content, dead code, debug output, and fake data not explicitly labeled as sample data.
 - Build the archive and inspect its file list when a zip is requested.
+
+## Presentations
+
+- The audience, outcome, venue, duration, narrative, and brand status are explicit.
+- The active brand pack owns stable colors, fonts, logo treatment, and approved layouts; slide-local CSS does not silently contradict it.
+- Every slide has one job, a unique `data-slide-id`, a registered `data-layout`, a semantic heading, and a `data-title`.
+- Fixed-stage decks preserve one 16:9 composition at every viewport; responsive decks are deliberately tested as reflowing reading experiences.
+- Local images declare a named ratio slot such as `hero-16x9`; generated images do not contain duplicated slide chrome.
+- Exactly one slide starts active; inactive slides are hidden from interaction with `aria-hidden` and `inert`.
+- Keyboard, wheel, swipe, boundary states, progress, deep links, fullscreen fallback, reduced motion, and print output work.
+- Run `python3 scripts/webapp.py validate <deck> --strict --rendered` when Playwright is available, then visually inspect every slide.

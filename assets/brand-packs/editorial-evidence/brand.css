@@ -1,0 +1,13 @@
+.slide {
+  background-image: linear-gradient(90deg, var(--primary) 0 10px, transparent 10px);
+}
+
+.slide[data-layout="cover"] h1,
+.slide[data-layout="statement"] h2 {
+  font-weight: 500;
+}
+
+.item {
+  border-top-width: 2px;
+  background: transparent;
+}
