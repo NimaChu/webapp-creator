@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="__SUMMARY__">
+  <title>__TITLE__</title>
+  <style>
+    /* Replace these tokens and slide compositions with a system derived from the subject. */
+    :root {
+      color-scheme: light;
+      --paper: #f3f5f2;
+      --surface: #ffffff;
+      --ink: #172327;
+      --muted: #5b686b;
+      --line: #cfd7d3;
+      --accent: #147a54;
+      --accent-soft: #dcefe5;
+      --structure: #1d6684;
+      --focus: #0a64a0;
+      --danger: #a22b2b;
+      --font-display: "Segoe UI", Arial, sans-serif;
+      --font-body: "Segoe UI", Arial, sans-serif;
+      --font-data: "Cascadia Mono", Consolas, monospace;
+      --content-width: 1180px;
+      --control-height: 44px;
+      --radius: 6px;
+      --shadow: 0 10px 28px rgba(23, 35, 39, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 8px;
+      left: 8px;
+      padding: 10px 14px;
+      transform: translateY(-160%);
+      border-radius: var(--radius);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .deck {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 64px 56px 112px;
+      overflow: auto;
+      visibility: hidden;
+      opacity: 0;
+      transform: translateX(24px);
+      pointer-events: none;
+    }
+
+    .slide.before {
+      transform: translateX(-24px);
+    }
+
+    .slide.active {
+      z-index: 2;
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .deck.ready .slide {
+      transition: opacity 220ms ease, transform 220ms ease, visibility 220ms step-end;
+    }
+
+    .deck.ready .slide.active {
+      transition: opacity 220ms ease, transform 220ms ease, visibility 0ms step-start;
+    }
+
+    .slide-frame {
+      width: min(100%, var(--content-width));
+      min-height: 100%;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 980px;
+      margin-bottom: 24px;
+      font-size: 64px;
+      line-height: 1.08;
+    }
+
+    h2 {
+      max-width: 960px;
+      margin-bottom: 28px;
+      font-size: 44px;
+      line-height: 1.14;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    p,
+    li,
+    td,
+    th {
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 25px;
+      line-height: 1.45;
+    }
+
+    .context-line {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-top: 52px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .context-line::before {
+      width: 72px;
+      height: 3px;
+      background: var(--accent);
+      content: "";
+    }
+
+    .layout-split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 72px;
+      align-items: center;
+    }
+
+    .statement {
+      padding-left: 24px;
+      border-left: 5px solid var(--accent);
+    }
+
+    .statement strong {
+      display: block;
+      margin-bottom: 12px;
+      font-family: var(--font-data);
+      font-size: 48px;
+      line-height: 1;
+      color: var(--structure);
+    }
+
+    .evidence-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+
+    .evidence-list li {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .evidence-list b {
+      color: var(--accent);
+      font-family: var(--font-data);
+      font-size: 16px;
+    }
+
+    .process {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin-top: 32px;
+      border-top: 3px solid var(--ink);
+    }
+
+    .process-step {
+      position: relative;
+      min-height: 210px;
+      padding: 28px 30px 20px 0;
+      border-top: 8px solid transparent;
+    }
+
+    .process-step + .process-step {
+      padding-left: 30px;
+      border-left: 1px solid var(--line);
+    }
+
+    .process-step::before {
+      position: absolute;
+      top: -8px;
+      left: 0;
+      width: 48%;
+      height: 8px;
+      background: var(--accent);
+      content: "";
+    }
+
+    .process-step + .process-step::before {
+      left: 30px;
+    }
+
+    .step-number {
+      display: block;
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 15px;
+    }
+
+    .process-step p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .comparison-wrap {
+      overflow-x: auto;
+      border-top: 3px solid var(--ink);
+    }
+
+    .comparison {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .comparison th,
+    .comparison td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .comparison th {
+      color: var(--muted);
+      font-size: 15px;
+      text-transform: uppercase;
+    }
+
+    .comparison td:first-child {
+      width: 27%;
+      font-weight: 700;
+    }
+
+    .comparison .recommended {
+      background: var(--accent-soft);
+    }
+
+    .close-line {
+      width: 96px;
+      height: 8px;
+      margin-bottom: 36px;
+      background: var(--accent);
+    }
+
+    .closing-note {
+      margin-top: 36px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .slide-note {
+      display: none;
+    }
+
+    .progress-track {
+      position: fixed;
+      z-index: 20;
+      inset: 0 0 auto;
+      height: 4px;
+      background: rgba(23, 35, 39, 0.12);
+    }
+
+    .language-button {
+      position: fixed;
+      z-index: 24;
+      top: 18px;
+      right: 20px;
+      min-width: 44px;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(23, 35, 39, 0.08);
+    }
+
+    .language-button:hover {
+      background: var(--accent-soft);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
+    .deck-chrome {
+      position: fixed;
+      z-index: 20;
+      right: 20px;
+      bottom: 18px;
+      left: 20px;
+      display: grid;
+      grid-template-columns: minmax(84px, 1fr) auto minmax(84px, 1fr);
+      align-items: center;
+      gap: 16px;
+      pointer-events: none;
+    }
+
+    .slide-count {
+      justify-self: start;
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+
+    .control-button {
+      min-width: var(--control-height);
+      height: var(--control-height);
+      padding: 0 14px;
+      border: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    .control-button.icon-only {
+      width: var(--control-height);
+      padding: 0;
+      font-size: 22px;
+    }
+
+    .control-button:hover:not(:disabled) {
+      background: var(--accent-soft);
+    }
+
+    .control-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.35;
+    }
+
+    .deck-label {
+      justify-self: end;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 14px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .notes-panel {
+      position: fixed;
+      z-index: 30;
+      right: 20px;
+      bottom: 86px;
+      width: min(440px, calc(100vw - 40px));
+      max-height: min(42vh, 340px);
+      padding: 20px;
+      overflow: auto;
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(10px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.55;
+      transition: opacity 160ms ease, transform 160ms ease, visibility 160ms step-end;
+    }
+
+    .notes-panel.open {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 160ms ease, transform 160ms ease, visibility 0ms step-start;
+    }
+
+    @media (max-width: 900px) {
+      .slide {
+        padding: 48px 32px 108px;
+      }
+
+      h1 {
+        font-size: 44px;
+      }
+
+      h2 {
+        font-size: 36px;
+      }
+
+      .lead {
+        font-size: 22px;
+      }
+
+      .layout-split {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .process {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .process-step:nth-child(3) {
+        border-left: 0;
+      }
+
+      .deck-label {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .slide {
+        padding: 64px 20px 100px;
+      }
+
+      .language-button {
+        top: 12px;
+        right: 12px;
+        height: 40px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      h2 {
+        font-size: 30px;
+      }
+
+      h3 {
+        font-size: 19px;
+      }
+
+      p,
+      li,
+      td,
+      th {
+        font-size: 17px;
+      }
+
+      .lead {
+        font-size: 19px;
+      }
+
+      .process {
+        grid-template-columns: 1fr;
+      }
+
+      .process-step,
+      .process-step + .process-step {
+        min-height: auto;
+        padding: 22px 0;
+        border-left: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .process-step + .process-step::before {
+        left: 0;
+      }
+
+      .deck-chrome {
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+        grid-template-columns: 52px minmax(0, 1fr) 0;
+        gap: 6px;
+      }
+
+      .controls {
+        justify-self: stretch;
+      }
+
+      .control-button {
+        min-width: 38px;
+        height: 40px;
+        padding: 0 9px;
+        font-size: 14px;
+      }
+
+      .control-button.icon-only {
+        width: 40px;
+      }
+
+      .notes-panel {
+        right: 10px;
+        bottom: 70px;
+        width: calc(100vw - 20px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    @page {
+      size: 16in 9in;
+      margin: 0;
+    }
+
+    @media print {
+      html,
+      body {
+        width: auto;
+        height: auto;
+        overflow: visible;
+        background: #ffffff;
+      }
+
+      .deck {
+        height: auto;
+        overflow: visible;
+      }
+
+      .slide {
+        position: relative !important;
+        inset: auto !important;
+        display: flex !important;
+        width: 16in;
+        height: 9in;
+        padding: 0.7in 0.8in;
+        overflow: hidden;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .progress-track,
+      .deck-chrome,
+      .notes-panel,
+      .language-button,
+      .skip-link {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body data-html-design-kind="presentation">
+  <a class="skip-link" href="#deck" data-i18n="skip">Skip to presentation</a>
+  <button class="language-button" id="languageBtn" type="button" aria-label="切换到中文" title="切换到中文">中</button>
+
+  <main class="deck" id="deck" aria-label="__TITLE__ presentation" data-i18n-aria-label="deckAria">
+    <section class="slide active" data-title-key="slideOpening" aria-hidden="false">
+      <div class="slide-frame">
+        <p class="eyebrow" data-i18n="purpose">Presentation purpose</p>
+        <h1 data-i18n="deckTitle">__TITLE__</h1>
+        <p class="lead" data-i18n="deckSummary">__SUMMARY__</p>
+        <p class="context-line" data-i18n="context">Audience / occasion / date</p>
+        <aside class="slide-note" data-i18n="noteOpening">Open with the decision or question this presentation exists to support.</aside>
+      </div>
+    </section>
+
+    <section class="slide" data-title-key="slideQuestion" aria-hidden="true">
+      <div class="slide-frame layout-split">
+        <div>
+          <p class="eyebrow" data-i18n="orientation">01 / Orientation</p>
+          <h2 data-i18n="questionTitle">State the tension before explaining the solution</h2>
+          <p class="lead" data-i18n="questionLead">Give the audience a reason to care and a clear lens for the evidence that follows.</p>
+        </div>
+        <div class="statement">
+          <strong data-i18n="oneIdea">1 idea</strong>
+          <p data-i18n="oneIdeaBody">Use each slide to advance one primary point. Split dense material instead of shrinking it.</p>
+        </div>
+        <aside class="slide-note" data-i18n="noteQuestion">Replace this example with the concrete problem, audience impact, and stakes.</aside>
+      </div>
+    </section>
+
+    <section class="slide" data-title-key="slideEvidence" aria-hidden="true">
+      <div class="slide-frame layout-split">
+        <div>
+          <p class="eyebrow" data-i18n="evidence">02 / Evidence</p>
+          <h2 data-i18n="evidenceTitle">Let the structure reveal why the conclusion follows</h2>
+        </div>
+        <ol class="evidence-list">
+          <li><b>01</b><span data-i18n="evidenceOne">Lead with the strongest verified fact or observation.</span></li>
+          <li><b>02</b><span data-i18n="evidenceTwo">Show the consequence in the audience's own vocabulary.</span></li>
+          <li><b>03</b><span data-i18n="evidenceThree">Connect the evidence to the decision or next action.</span></li>
+        </ol>
+        <aside class="slide-note" data-i18n="noteEvidence">Use real figures, diagrams, screenshots, or citations here. Do not keep generic sample claims.</aside>
+      </div>
+    </section>
+
+    <section class="slide" data-title-key="slideApproach" aria-hidden="true">
+      <div class="slide-frame">
+        <p class="eyebrow" data-i18n="development">03 / Development</p>
+        <h2 data-i18n="approachTitle">Turn the proposed approach into a sequence people can follow</h2>
+        <div class="process" aria-label="Four-stage example process" data-i18n-aria-label="processAria">
+          <article class="process-step">
+            <span class="step-number">01</span>
+            <h3 data-i18n="stepFrame">Frame</h3>
+            <p data-i18n="stepFrameBody">Define the intended outcome and constraints.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-number">02</span>
+            <h3 data-i18n="stepExplore">Explore</h3>
+            <p data-i18n="stepExploreBody">Compare credible options and expose tradeoffs.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-number">03</span>
+            <h3 data-i18n="stepProve">Prove</h3>
+            <p data-i18n="stepProveBody">Use evidence or a demonstration to reduce uncertainty.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-number">04</span>
+            <h3 data-i18n="stepAct">Act</h3>
+            <p data-i18n="stepActBody">Name the owner, decision, and next checkpoint.</p>
+          </article>
+        </div>
+        <aside class="slide-note" data-i18n="noteApproach">Adapt the number and shape of stages to the real process. This is not a mandatory four-step template.</aside>
+      </div>
+    </section>
+
+    <section class="slide" data-title-key="slideDecision" aria-hidden="true">
+      <div class="slide-frame">
+        <p class="eyebrow" data-i18n="decision">04 / Decision</p>
+        <h2 data-i18n="decisionTitle">Make alternatives comparable without hiding tradeoffs</h2>
+        <div class="comparison-wrap">
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th scope="col" data-i18n="criterion">Criterion</th>
+                <th scope="col" data-i18n="optionA">Option A</th>
+                <th scope="col" class="recommended" data-i18n="recommended">Recommended path</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-i18n="timeValue">Time to value</td>
+                <td data-i18n="baseline">Describe the credible baseline.</td>
+                <td class="recommended" data-i18n="stronger">Explain why this path is stronger.</td>
+              </tr>
+              <tr>
+                <td data-i18n="fit">Operational fit</td>
+                <td data-i18n="constraint">Name the practical constraint.</td>
+                <td class="recommended" data-i18n="realWork">Connect the choice to real work.</td>
+              </tr>
+              <tr>
+                <td data-i18n="risk">Risk</td>
+                <td data-i18n="exposure">State the unresolved exposure.</td>
+                <td class="recommended" data-i18n="mitigation">Show the mitigation or checkpoint.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="slide-note" data-i18n="noteDecision">Use criteria the audience recognizes. Avoid fabricated precision and decorative scores.</aside>
+      </div>
+    </section>
+
+    <section class="slide" data-title-key="slideClose" aria-hidden="true">
+      <div class="slide-frame">
+        <div class="close-line" aria-hidden="true"></div>
+        <p class="eyebrow" data-i18n="close">05 / Close</p>
+        <h2 data-i18n="closeTitle">End with the decision, action, or idea worth carrying forward</h2>
+        <p class="lead" data-i18n="closeLead">Make the final sentence useful after the presentation ends.</p>
+        <p class="closing-note" data-i18n="closeMeta">Owner &middot; next action &middot; timing</p>
+        <aside class="slide-note" data-i18n="noteClose">Pause here. Restate the requested decision and leave time for questions or the live demonstration.</aside>
+      </div>
+    </section>
+  </main>
+
+  <div class="progress-track" aria-hidden="true">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="deck-chrome" aria-label="Presentation controls" data-i18n-aria-label="controlsAria">
+    <output class="slide-count" id="slideCount" aria-live="polite">01 / 06</output>
+    <nav class="controls" aria-label="Slide controls" data-i18n-aria-label="slideControlsAria">
+      <button class="control-button icon-only" id="prevBtn" type="button" aria-label="Previous slide" title="Previous slide" data-i18n-aria-label="previous" data-i18n-title="previous">&larr;</button>
+      <button class="control-button icon-only" id="nextBtn" type="button" aria-label="Next slide" title="Next slide" data-i18n-aria-label="next" data-i18n-title="next">&rarr;</button>
+      <button class="control-button" id="notesBtn" type="button" aria-pressed="false">Notes</button>
+      <button class="control-button" id="fullBtn" type="button" aria-pressed="false">Full screen</button>
+    </nav>
+    <span class="deck-label" data-i18n="deckTitle">__TITLE__</span>
+  </div>
+
+  <aside class="notes-panel" id="notesPanel" aria-live="polite" aria-label="Speaker notes" data-i18n-aria-label="speakerNotes"></aside>
+
+  <script>
+    (() => {
+      // Keep both language dictionaries complete when replacing the sample content.
+      const messages = {
+        en: {
+          skip: "Skip to presentation",
+          deckAria: "__TITLE__ presentation",
+          purpose: "Presentation purpose",
+          deckTitle: "__TITLE__",
+          deckSummary: "__SUMMARY__",
+          context: "Audience / occasion / date",
+          noteOpening: "Open with the decision or question this presentation exists to support.",
+          slideOpening: "Opening",
+          slideQuestion: "Core question",
+          slideEvidence: "Evidence",
+          slideApproach: "Approach",
+          slideDecision: "Decision",
+          slideClose: "Close",
+          orientation: "01 / Orientation",
+          questionTitle: "State the tension before explaining the solution",
+          questionLead: "Give the audience a reason to care and a clear lens for the evidence that follows.",
+          oneIdea: "1 idea",
+          oneIdeaBody: "Use each slide to advance one primary point. Split dense material instead of shrinking it.",
+          noteQuestion: "Replace this example with the concrete problem, audience impact, and stakes.",
+          evidence: "02 / Evidence",
+          evidenceTitle: "Let the structure reveal why the conclusion follows",
+          evidenceOne: "Lead with the strongest verified fact or observation.",
+          evidenceTwo: "Show the consequence in the audience's own vocabulary.",
+          evidenceThree: "Connect the evidence to the decision or next action.",
+          noteEvidence: "Use real figures, diagrams, screenshots, or citations here. Do not keep generic sample claims.",
+          development: "03 / Development",
+          approachTitle: "Turn the proposed approach into a sequence people can follow",
+          processAria: "Four-stage example process",
+          stepFrame: "Frame",
+          stepFrameBody: "Define the intended outcome and constraints.",
+          stepExplore: "Explore",
+          stepExploreBody: "Compare credible options and expose tradeoffs.",
+          stepProve: "Prove",
+          stepProveBody: "Use evidence or a demonstration to reduce uncertainty.",
+          stepAct: "Act",
+          stepActBody: "Name the owner, decision, and next checkpoint.",
+          noteApproach: "Adapt the number and shape of stages to the real process. This is not a mandatory four-step template.",
+          decision: "04 / Decision",
+          decisionTitle: "Make alternatives comparable without hiding tradeoffs",
+          criterion: "Criterion",
+          optionA: "Option A",
+          recommended: "Recommended path",
+          timeValue: "Time to value",
+          baseline: "Describe the credible baseline.",
+          stronger: "Explain why this path is stronger.",
+          fit: "Operational fit",
+          constraint: "Name the practical constraint.",
+          realWork: "Connect the choice to real work.",
+          risk: "Risk",
+          exposure: "State the unresolved exposure.",
+          mitigation: "Show the mitigation or checkpoint.",
+          noteDecision: "Use criteria the audience recognizes. Avoid fabricated precision and decorative scores.",
+          close: "05 / Close",
+          closeTitle: "End with the decision, action, or idea worth carrying forward",
+          closeLead: "Make the final sentence useful after the presentation ends.",
+          closeMeta: "Owner · next action · timing",
+          noteClose: "Pause here. Restate the requested decision and leave time for questions or the live demonstration.",
+          controlsAria: "Presentation controls",
+          slideControlsAria: "Slide controls",
+          previous: "Previous slide",
+          next: "Next slide",
+          notes: "Notes",
+          hideNotes: "Hide notes",
+          fullScreen: "Full screen",
+          exitFullScreen: "Exit full screen",
+          speakerNotes: "Speaker notes",
+          noNotes: "No notes for this slide.",
+          switchLanguage: "Switch to Chinese",
+          fullscreenUnavailable: "Full screen is unavailable in this browser or embedded view."
+        },
+        zh: {
+          skip: "跳到演示文稿",
+          deckAria: "__TITLE__演示文稿",
+          purpose: "演示目的",
+          deckTitle: "__TITLE__",
+          deckSummary: "__SUMMARY__",
+          context: "受众 / 场合 / 日期",
+          noteOpening: "从这份演示需要支持的决策或核心问题开始。",
+          slideOpening: "开场",
+          slideQuestion: "核心问题",
+          slideEvidence: "证据",
+          slideApproach: "方法",
+          slideDecision: "决策",
+          slideClose: "收束",
+          orientation: "01 / 定位",
+          questionTitle: "先讲清矛盾，再解释解决方案",
+          questionLead: "让受众知道为什么值得关注，并为后续证据提供清晰视角。",
+          oneIdea: "一个观点",
+          oneIdeaBody: "每一页只推进一个主要观点。内容过密时应拆页，而不是不断缩小字号。",
+          noteQuestion: "请替换为具体问题、对受众的影响以及问题的重要性。",
+          evidence: "02 / 证据",
+          evidenceTitle: "让信息结构自然推导出结论",
+          evidenceOne: "从最有力且经过验证的事实或观察开始。",
+          evidenceTwo: "用受众熟悉的语言说明其影响。",
+          evidenceThree: "将证据连接到决策或下一步行动。",
+          noteEvidence: "请使用真实数据、图表、截图或引用，不要保留泛化的示例结论。",
+          development: "03 / 展开",
+          approachTitle: "把方案转化为受众能够跟随的清晰步骤",
+          processAria: "四阶段示例流程",
+          stepFrame: "界定",
+          stepFrameBody: "明确预期结果与约束。",
+          stepExplore: "探索",
+          stepExploreBody: "比较可信方案并呈现取舍。",
+          stepProve: "验证",
+          stepProveBody: "通过证据或演示降低不确定性。",
+          stepAct: "行动",
+          stepActBody: "明确负责人、决策和下一个检查点。",
+          noteApproach: "请根据真实流程调整阶段数量和结构，这不是固定的四步模板。",
+          decision: "04 / 决策",
+          decisionTitle: "让不同方案可比较，同时保留真实取舍",
+          criterion: "评估标准",
+          optionA: "方案 A",
+          recommended: "推荐方案",
+          timeValue: "价值实现速度",
+          baseline: "描述可信的基准方案。",
+          stronger: "说明推荐方案更强的原因。",
+          fit: "业务适配度",
+          constraint: "指出实际约束。",
+          realWork: "将选择与真实工作连接起来。",
+          risk: "风险",
+          exposure: "说明尚未解决的风险敞口。",
+          mitigation: "展示缓解措施或检查点。",
+          noteDecision: "使用受众认可的标准，避免虚构精度和装饰性评分。",
+          close: "05 / 收束",
+          closeTitle: "以值得带走的决策、行动或观点结束",
+          closeLead: "让最后一句话在演示结束后仍然有用。",
+          closeMeta: "负责人 · 下一步 · 时间",
+          noteClose: "在此停顿，重申需要的决策，并为提问或现场演示留出时间。",
+          controlsAria: "演示控制",
+          slideControlsAria: "幻灯片控制",
+          previous: "上一页",
+          next: "下一页",
+          notes: "备注",
+          hideNotes: "收起备注",
+          fullScreen: "全屏",
+          exitFullScreen: "退出全屏",
+          speakerNotes: "讲者备注",
+          noNotes: "本页暂无备注。",
+          switchLanguage: "Switch to English",
+          fullscreenUnavailable: "当前浏览器或嵌入页面不支持全屏。"
+        }
+      };
+
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const deck = document.getElementById('deck');
+      const progressBar = document.getElementById('progressBar');
+      const slideCount = document.getElementById('slideCount');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const notesBtn = document.getElementById('notesBtn');
+      const fullBtn = document.getElementById('fullBtn');
+      const languageBtn = document.getElementById('languageBtn');
+      const notesPanel = document.getElementById('notesPanel');
+      let index = parseHash();
+      let notesOpen = false;
+      let fullscreenActive = false;
+      let language = 'en';
+      let wheelLocked = false;
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      function parseHash() {
+        const match = window.location.hash.match(/^#slide-(\d+)$/);
+        const requested = match ? Number(match[1]) - 1 : 0;
+        return Math.max(0, Math.min(slides.length - 1, requested));
+      }
+
+      function pad(value) {
+        return String(value).padStart(2, '0');
+      }
+
+      function t(key) {
+        return messages[language][key] ?? messages.en[key] ?? key;
+      }
+
+      function updateControls() {
+        notesBtn.textContent = notesOpen ? t('hideNotes') : t('notes');
+        fullBtn.textContent = fullscreenActive ? t('exitFullScreen') : t('fullScreen');
+        languageBtn.textContent = language === 'en' ? '中' : 'EN';
+        languageBtn.setAttribute('aria-label', t('switchLanguage'));
+        languageBtn.title = t('switchLanguage');
+      }
+
+      function applyLanguage(nextLanguage) {
+        language = messages[nextLanguage] ? nextLanguage : 'en';
+        document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+        document.body.dataset.language = language;
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+          element.textContent = t(element.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-aria-label]').forEach(element => {
+          element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel));
+        });
+        document.querySelectorAll('[data-i18n-title]').forEach(element => {
+          element.title = t(element.dataset.i18nTitle);
+        });
+        updateControls();
+        render(index, false);
+      }
+
+      function updateNotes() {
+        const note = slides[index].querySelector('.slide-note');
+        notesPanel.textContent = note ? note.textContent.trim() : t('noNotes');
+      }
+
+      function render(nextIndex, updateHash = true) {
+        index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === index;
+          slide.classList.toggle('active', active);
+          slide.classList.toggle('before', slideIndex < index);
+          slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+          if (active) slide.removeAttribute('inert');
+          else slide.setAttribute('inert', '');
+        });
+        progressBar.style.width = `${((index + 1) / slides.length) * 100}%`;
+        slideCount.value = `${pad(index + 1)} / ${pad(slides.length)}`;
+        slideCount.textContent = slideCount.value;
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === slides.length - 1;
+        const slideTitle = t(slides[index].dataset.titleKey) || `${index + 1}`;
+        document.title = `${slideTitle} | ${t('deckTitle')}`;
+        updateNotes();
+        if (updateHash) window.history.replaceState(null, '', `#slide-${index + 1}`);
+      }
+
+      function next() {
+        render(index + 1);
+      }
+
+      function previous() {
+        render(index - 1);
+      }
+
+      function toggleNotes() {
+        notesOpen = !notesOpen;
+        notesPanel.classList.toggle('open', notesOpen);
+        notesBtn.setAttribute('aria-pressed', String(notesOpen));
+        updateControls();
+      }
+
+      async function toggleFullscreen() {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (_) {
+          fullBtn.title = t('fullscreenUnavailable');
+        }
+      }
+
+      function isInteractive(target) {
+        return target instanceof Element && Boolean(target.closest('button, a, input, select, textarea, [contenteditable="true"]'));
+      }
+
+      function hasScrollableAncestor(target, deltaY) {
+        let node = target instanceof Element ? target : null;
+        while (node && node !== document.body) {
+          const style = window.getComputedStyle(node);
+          const canScroll = /(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight;
+          if (canScroll) {
+            const movingDown = deltaY > 0 && node.scrollTop + node.clientHeight < node.scrollHeight - 1;
+            const movingUp = deltaY < 0 && node.scrollTop > 1;
+            if (movingDown || movingUp) return true;
+          }
+          node = node.parentElement;
+        }
+        return false;
+      }
+
+      prevBtn.addEventListener('click', previous);
+      nextBtn.addEventListener('click', next);
+      notesBtn.addEventListener('click', toggleNotes);
+      fullBtn.addEventListener('click', toggleFullscreen);
+      languageBtn.addEventListener('click', () => applyLanguage(language === 'en' ? 'zh' : 'en'));
+
+      document.addEventListener('fullscreenchange', () => {
+        fullscreenActive = Boolean(document.fullscreenElement);
+        fullBtn.setAttribute('aria-pressed', String(fullscreenActive));
+        updateControls();
+      });
+
+      document.addEventListener('keydown', event => {
+        if (isInteractive(event.target)) return;
+        if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) {
+          event.preventDefault();
+          next();
+        } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+          event.preventDefault();
+          previous();
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          render(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          render(slides.length - 1);
+        } else if (event.key.toLowerCase() === 'n') {
+          event.preventDefault();
+          toggleNotes();
+        } else if (event.key.toLowerCase() === 'f') {
+          event.preventDefault();
+          toggleFullscreen();
+        } else if (event.key.toLowerCase() === 'l') {
+          event.preventDefault();
+          applyLanguage(language === 'en' ? 'zh' : 'en');
+        }
+      });
+
+      document.addEventListener('wheel', event => {
+        if (wheelLocked || Math.abs(event.deltaY) < 18 || isInteractive(event.target)) return;
+        if (hasScrollableAncestor(event.target, event.deltaY)) return;
+        wheelLocked = true;
+        event.deltaY > 0 ? next() : previous();
+        window.setTimeout(() => {
+          wheelLocked = false;
+        }, 560);
+      }, { passive: true });
+
+      document.addEventListener('touchstart', event => {
+        touchStartX = event.changedTouches[0].clientX;
+        touchStartY = event.changedTouches[0].clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchend', event => {
+        const deltaX = event.changedTouches[0].clientX - touchStartX;
+        const deltaY = event.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(deltaX) > 54 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          deltaX < 0 ? next() : previous();
+        }
+      }, { passive: true });
+
+      window.addEventListener('hashchange', () => {
+        render(parseHash(), false);
+      });
+
+      applyLanguage(language);
+      window.requestAnimationFrame(() => deck.classList.add('ready'));
+    })();
+  </script>
+</body>
+</html>

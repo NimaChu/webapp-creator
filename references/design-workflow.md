@@ -1,78 +1,96 @@
-# Design Workflow
+# HTML Design Workflow
 
-## Define The Product Contract
+## 1. Define The Product Contract
 
 Before styling, write down:
 
-- Audience and environment: desktop, phone, local file, or local server.
+- Audience and environment: desktop browser, mobile, offline file, Eqai iframe, or another host.
 - Primary job: one sentence beginning with a verb.
-- Inputs: types, examples, validation, limits, and sensitive-data considerations.
-- Outputs: results, copy/download behavior, and error recovery.
-- States: empty, ready, working, success, partial, error, and reset.
-- Persistence: none, local storage, IndexedDB, or exported files.
+- Inputs: type, validation, examples, maximum size, and sensitive-data considerations.
+- Outputs: what appears, what can be copied/downloaded, and how errors are recovered.
+- State: empty, ready, working, success, partial success, error, and reset.
+- Delivery: one HTML file, an asset folder, an HTML presentation, or an Eqai AI package.
 
-Infer reversible details and build the core workflow first. Ask only when an assumption changes data handling, security, or the fundamental interaction.
+If the contract is unclear, infer reversible details and build the core workflow first. Ask only when an assumption would change data handling, security, or the fundamental interaction.
 
-For presentation aesthetics, prefer evidence over adjectives. If the subject, venue, and brand do not make the visual direction clear, render a small set of cover previews with the user's real title and purpose. Ask the user to react to visible alternatives, then carry the selected system through the full deck.
+## 2. Choose Complexity Deliberately
 
-## Choose Complexity Deliberately
+Use one self-contained HTML file when the tool can be expressed with browser APIs and modest JavaScript. This is the default for Eqai HTML tools because it is portable and easy to inspect.
 
-Use one self-contained HTML file when browser APIs and modest JavaScript are sufficient. Split local CSS, JavaScript, or media only when the single file becomes difficult to maintain. Keep split projects static and dependency-light.
+Use separate local CSS/JS assets when the file is becoming difficult to maintain. Use a framework only when the request genuinely needs complex state, routing, a component ecosystem, or an existing project already uses it. Do not introduce a build chain for a small form-and-result utility.
 
-## Compose The Interface
+## 3. Establish Visual Direction
 
-Preserve the user's information hierarchy and all decision-relevant content. Let the
-amount of real content determine the number of sections, cards, steps, or slides.
-Never manufacture measurements, trends, testimonials, citations, or conclusions.
-Clearly label intentional demonstration data as sample data.
+Derive one coherent direction from the brief:
 
-For tools:
+- `density`: compact, balanced, or spacious
+- `tone`: operational, analytical, editorial, playful, or technical
+- `scheme`: light, dark, or system-aware
+- `brand`: existing product/company palette or a restrained neutral palette
+- `emphasis`: the one action or data point that should win first glance
 
-1. Use a compact literal title and one-line purpose.
-2. Group inputs by the user's mental model.
-3. Place the primary action beside the controls it affects.
-4. Keep output and copy/download actions together.
-5. Hide secondary settings until needed.
+Select one of the five interface directions in [visual-directions.md](visual-directions.md), then write a compact design brief before coding. For a presentation, use [presentation-guide.md](presentation-guide.md) to derive a subject-specific deck system instead of selecting an interface direction:
 
-For data views:
+- `subject`: the concrete domain and its real vocabulary
+- `direction`: workbench, analytics, guided, knowledge, or ai-studio
+- `density`: compact, balanced, or spacious
+- `palette`: 4-6 named colors with hex values
+- `type`: display, body, and utility/data roles
+- `layout`: one sentence describing the information structure
+- `signature`: one useful, subject-specific treatment the interface will be remembered by
 
-1. Lead with decision-relevant metrics.
-2. Show comparison context and units.
-3. Use charts for shape and tables for precise lookup.
-4. Surface exceptions before decoration.
-5. Give every chart an explicit responsive height or `min-height`; do not rely on an unconstrained parent.
+Use this as a constraint, not as a style catalog. Keep typography, spacing, borders, color, and interaction states consistent throughout the artifact. If the same design brief could fit an unrelated tool after changing only the title, revise the layout or signature before coding.
 
-Avoid marketing-style hero sections, decorative feature grids, and controls without working behavior.
+For KOSTAL-facing tools, use neutral white/gray surfaces, dark readable text, blue as an optional structural color, and shallow green for normal actions and success. Avoid red except for genuine destructive/error states.
 
-## Interaction Quality
+## 4. Compose The Interface
 
-- Preserve input after recoverable errors.
-- Put field errors next to the failed control.
-- Use `aria-live="polite"` for asynchronous status and result summaries.
-- Keep pointer targets at least 40×40 px; use 44 px for touch-oriented apps.
-- Match keyboard order to visual order.
-- Use visible `:focus-visible` treatment.
-- Confirm only destructive or irreversible actions.
-- Provide non-blocking copy/download feedback.
+Tool layout:
 
-## Responsive Rules
+1. Compact header with the literal tool name and optional one-line context.
+2. Input controls grouped by the user's mental model.
+3. Primary action adjacent to the controls it acts on.
+4. Output region with copy/download actions near the output.
+5. Secondary settings hidden behind tabs, details, or a compact settings panel when they are not part of the main path.
 
-- Use fluid widths and `minmax(0, 1fr)`.
-- Collapse panels before controls or labels become cramped.
+Operational interfaces should prioritize scanning and repeated action. Avoid oversized hero text, decorative page sections, and marketing-style copy.
+
+## 5. Interaction Quality
+
+- Disable or explain unavailable actions.
+- Preserve the user's input after recoverable errors.
+- Put error text next to the failed field or result area.
+- Use `aria-live="polite"` for asynchronous status and output summaries.
+- Keep pointer targets at least 40x40px; use 44px where the interface is touch-oriented.
+- Make keyboard order match visual order.
+- Use `:focus-visible` with a high-contrast outline.
+- Confirm dialogs only for destructive or irreversible actions.
+- Provide copy/download feedback without blocking modal dialogs.
+
+## 6. Responsive Rules
+
+Design desktop first for internal Eqai usage, then verify narrow layouts:
+
+- Use `minmax(0, 1fr)` for flexible grid tracks.
+- Let tool panels collapse to one column before text or controls become cramped.
+- Avoid fixed page widths; constrain content with `max-width` plus fluid side padding.
 - Give tables an intentional overflow strategy.
-- Give canvases and charts stable responsive dimensions.
-- Keep the main action visible early on mobile.
-- Ensure the longest control label fits at 320 px.
+- Give charts/canvases a stable aspect ratio or explicit responsive height.
+- At 320px, the longest label and button text must fit without clipping.
 
-## Typography And Contrast
+## 7. Validation And Browser QA
 
-- For Chinese interfaces, use a local CJK-first stack such as `"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif`.
-- Use local system fonts by default; do not make legibility depend on a font download.
-- Keep normal text and essential control text at a contrast ratio of at least 4.5:1.
-- Do not use color alone to communicate state, category, or validation.
+Run the static validator, then verify at minimum:
 
-## Existing Apps
+- Desktop: 1440x900 or the user's primary browser size.
+- Narrow: 390x844 and 320px width.
+- Empty input, realistic input, invalid input, reset, copy/download, and asynchronous failure states.
+- No horizontal page overflow, overlapping controls, clipped labels, blank charts, or console errors.
+- Tab navigation reaches every interactive control and focus remains visible.
+- Reduced-motion mode still communicates state.
 
-Preserve working domain behavior while improving structure and presentation. Test behavior before and after the change. Remove dead controls, placeholder data, debug output, and fake success states.
+For existing tools, preserve domain logic while improving presentation. Diff the behavior, not only the markup.
 
-For an existing branded presentation, identify the active brand pack, visual system, approved layouts, image slots, and stage mode before changing individual slides. Fix repeated problems in the pack or shared runtime rather than accumulating page-local overrides.
+Run one final genericity check: remove any element whose only purpose is to make the page look designed, and strengthen any structural treatment that helps the user scan, compare, decide, or complete the task.
+
+For presentations, additionally verify every slide, direct hash navigation, presenter controls, notes, fullscreen fallback, and one-slide-per-page print output. Narrative clarity and projection legibility matter more than preserving starter compositions.

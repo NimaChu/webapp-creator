@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --page: #f4f6f5;
+      --surface: #ffffff;
+      --soft: #edf3f0;
+      --text: #17201c;
+      --muted: #627169;
+      --line: #d4ddd8;
+      --green: #2f7548;
+      --green-strong: #245d39;
+      --blue: #1e467d;
+      font-family: Arial, "Microsoft YaHei UI", sans-serif;
+      color: var(--text);
+      background: var(--page);
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; margin: 0; }
+    button, input, textarea { font: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #78a8cf; outline-offset: 2px; }
+    .appbar { border-bottom: 1px solid var(--line); background: var(--surface); }
+    .appbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(1320px, calc(100% - 40px)); min-height: 66px; margin: 0 auto; }
+    .title-block { min-width: 0; }
+    h1 { overflow: hidden; margin: 0; color: var(--blue); font-size: 20px; letter-spacing: 0; text-overflow: ellipsis; white-space: nowrap; }
+    .summary { overflow: hidden; margin: 4px 0 0; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .search { width: min(360px, 42vw); min-height: 40px; padding: 8px 12px; border: 1px solid #afbeb6; border-radius: 6px; color: var(--text); background: #fbfcfb; }
+    .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr) 260px; width: min(1320px, calc(100% - 40px)); min-height: calc(100vh - 98px); margin: 16px auto; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .nav { padding: 18px 14px; border-right: 1px solid var(--line); background: #f8faf9; }
+    .nav-label, .note-label { margin: 0 8px 10px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .nav-list { display: grid; gap: 4px; padding: 0; margin: 0; list-style: none; }
+    .nav-button { width: 100%; min-height: 40px; padding: 8px 10px; border: 0; border-left: 3px solid transparent; border-radius: 0; color: var(--text); background: transparent; text-align: left; cursor: pointer; }
+    .nav-button:hover { background: var(--soft); }
+    .nav-button.active { border-left-color: var(--green); color: var(--green-strong); background: var(--soft); font-weight: 700; }
+    .article { min-width: 0; padding: 30px 38px 50px; }
+    .article-inner { max-width: 760px; margin: 0 auto; }
+    .eyebrow { margin: 0 0 9px; color: var(--green); font-size: 11px; font-weight: 700; }
+    h2 { margin: 0; font-size: 26px; line-height: 1.25; letter-spacing: 0; }
+    .lead { margin: 12px 0 24px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .callout { padding: 15px 17px; border-left: 3px solid var(--blue); background: #edf3f8; font-size: 13px; line-height: 1.6; }
+    .content-section { margin-top: 28px; }
+    h3 { margin: 0 0 10px; font-size: 16px; letter-spacing: 0; }
+    .content-section p { margin: 0; color: #34433b; font-size: 13px; line-height: 1.75; }
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0; margin: 14px 0 0; list-style: none; }
+    .facts li { padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: #fbfcfb; font-size: 12px; line-height: 1.5; }
+    mark { padding: 0 2px; color: inherit; background: #dcecdf; }
+    .notes { padding: 18px; border-left: 1px solid var(--line); background: #fbfcfb; }
+    textarea { width: 100%; min-height: 180px; resize: vertical; padding: 11px; border: 1px solid #afbeb6; border-radius: 6px; color: var(--text); background: var(--surface); line-height: 1.5; }
+    .note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    button.action { min-height: 38px; padding: 0 12px; border: 1px solid transparent; border-radius: 6px; color: #ffffff; background: var(--green); font-weight: 700; cursor: pointer; transition: background-color 120ms ease; }
+    button.action:hover { background: var(--green-strong); }
+    button.action.secondary { border-color: var(--line); color: var(--text); background: var(--surface); }
+    button.action.secondary:hover { background: var(--soft); }
+    .note-state { min-height: 18px; margin: 10px 0 0; color: var(--muted); font-size: 11px; }
+    .no-result { padding: 36px; color: var(--muted); text-align: center; }
+    [hidden] { display: none !important; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 190px minmax(0, 1fr); }
+      .notes { grid-column: 1 / -1; border-top: 1px solid var(--line); border-left: 0; }
+      .notes-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+      .note-actions { margin-top: 0; }
+    }
+    @media (max-width: 700px) {
+      .appbar-inner, .layout { width: calc(100% - 24px); }
+      .appbar-inner { display: block; padding: 13px 0; }
+      .summary { white-space: normal; }
+      .search { width: 100%; margin-top: 11px; }
+      .layout { grid-template-columns: 1fr; }
+      .nav { overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .nav-list { display: flex; min-width: max-content; }
+      .nav-button { border-left: 0; border-bottom: 3px solid transparent; }
+      .nav-button.active { border-bottom-color: var(--green); }
+      .article { padding: 24px 20px 36px; }
+      .notes-inner { grid-template-columns: 1fr; }
+      .note-actions { margin-top: 10px; }
+    }
+    @media (max-width: 420px) {
+      .facts { grid-template-columns: 1fr; }
+      h2 { font-size: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="title-block"><h1>__TITLE__</h1><p class="summary">__SUMMARY__</p></div>
+      <label for="searchInput"><span class="note-label">搜索当前知识</span><input class="search" id="searchInput" type="search" placeholder="输入关键词"></label>
+    </div>
+  </header>
+  <main class="layout">
+    <nav class="nav" aria-label="知识目录">
+      <p class="nav-label">内容目录</p>
+      <ul class="nav-list">
+        <li><button class="nav-button active" type="button" data-topic="overview">概览</button></li>
+        <li><button class="nav-button" type="button" data-topic="process">关键流程</button></li>
+        <li><button class="nav-button" type="button" data-topic="decisions">决策要点</button></li>
+      </ul>
+    </nav>
+    <article class="article">
+      <div class="article-inner" id="articleContent">
+        <p class="eyebrow" id="topicLabel">知识概览</p>
+        <h2 id="topicTitle">把分散信息整理成可行动的知识</h2>
+        <p class="lead" id="topicLead">此处为示例内容。创建实际工具时，请使用真实文档结构、领域术语和来源信息替换。</p>
+        <div class="callout" id="topicCallout">重要结论应说明适用范围、依据和下一步，而不是只给出一段脱离上下文的摘要。</div>
+        <section class="content-section"><h3>核心内容</h3><p id="topicBody">将信息按用户真正需要查找和判断的路径组织，保留来源、时间和责任人等必要上下文。</p></section>
+        <section class="content-section"><h3>快速参考</h3><ul class="facts" id="topicFacts"></ul></section>
+      </div>
+      <div class="no-result" id="noResult" hidden>没有找到匹配内容，请尝试更短的关键词。</div>
+    </article>
+    <aside class="notes" aria-labelledby="notesTitle">
+      <div class="notes-inner">
+        <div><label class="note-label" id="notesTitle" for="noteInput">个人笔记</label><textarea id="noteInput" placeholder="记录问题、判断或后续行动"></textarea></div>
+        <div class="note-actions"><button class="action" id="saveNote" type="button">保存到本页</button><button class="action secondary" id="copyNote" type="button">复制</button></div>
+      </div>
+      <p class="note-state" id="noteState" aria-live="polite">笔记仅保存在当前浏览器。</p>
+    </aside>
+  </main>
+  <script>
+    const topics = {
+      overview: { label: '知识概览', title: '把分散信息整理成可行动的知识', lead: '此处为示例内容。创建实际工具时，请使用真实文档结构、领域术语和来源信息替换。', callout: '重要结论应说明适用范围、依据和下一步，而不是只给出一段脱离上下文的摘要。', body: '将信息按用户真正需要查找和判断的路径组织，保留来源、时间和责任人等必要上下文。', facts: ['说明知识的适用范围', '保留来源与更新时间', '使用用户熟悉的业务术语', '把结论连接到下一步行动'] },
+      process: { label: '关键流程', title: '从原始信息到可复用结论', lead: '流程结构应对应真实工作步骤，便于用户定位当前阶段和遗漏信息。', callout: '先确认来源完整性，再提炼结论，最后明确责任和行动。', body: '示例流程包含收集、核对、归类、总结和发布。实际工具应根据业务过程调整顺序和验证条件。', facts: ['收集可信来源', '核对冲突与缺口', '按任务语境归类', '发布并保留追溯信息'] },
+      decisions: { label: '决策要点', title: '让知识支持判断，而不只是阅读', lead: '将事实、假设、风险和建议分开表达，让用户理解结论如何得出。', callout: '不确定信息应明确标记，不能用确定语气掩盖证据不足。', body: '每个决策点至少包含当前事实、可选方案、影响、负责人和复查时间。', facts: ['区分事实和假设', '说明方案影响', '标出风险与未知项', '记录负责人和复查时间'] }
+    }
+    let currentTopic = 'overview'
+    const noteInput = document.querySelector('#noteInput')
+
+    function renderTopic(key) {
+      currentTopic = key
+      const topic = topics[key]
+      document.querySelector('#topicLabel').textContent = topic.label
+      document.querySelector('#topicTitle').textContent = topic.title
+      document.querySelector('#topicLead').textContent = topic.lead
+      document.querySelector('#topicCallout').textContent = topic.callout
+      document.querySelector('#topicBody').textContent = topic.body
+      document.querySelector('#topicFacts').replaceChildren(...topic.facts.map(value => {
+        const node = document.createElement('li')
+        node.textContent = value
+        return node
+      }))
+      document.querySelectorAll('[data-topic]').forEach(node => node.classList.toggle('active', node.dataset.topic === key))
+      noteInput.value = localStorage.getItem(`knowledge-note-${key}`) || ''
+    }
+
+    document.querySelectorAll('[data-topic]').forEach(node => node.addEventListener('click', () => renderTopic(node.dataset.topic)))
+    document.querySelector('#searchInput').addEventListener('input', event => {
+      const query = event.target.value.trim().toLowerCase()
+      const match = Object.entries(topics).find(([, topic]) => Object.values(topic).flat().join(' ').toLowerCase().includes(query))
+      document.querySelector('#articleContent').hidden = Boolean(query && !match)
+      document.querySelector('#noResult').hidden = !query || Boolean(match)
+      if (query && match) renderTopic(match[0])
+    })
+    document.querySelector('#saveNote').addEventListener('click', () => {
+      localStorage.setItem(`knowledge-note-${currentTopic}`, noteInput.value)
+      document.querySelector('#noteState').textContent = '笔记已保存到当前浏览器。'
+    })
+    document.querySelector('#copyNote').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(noteInput.value)
+      document.querySelector('#noteState').textContent = '笔记已复制。'
+    })
+    renderTopic('overview')
+  </script>
+</body>
+</html>

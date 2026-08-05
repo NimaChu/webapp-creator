@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "mode": "ai-enabled",
+  "entry": "index.html",
+  "bridgeVersion": 1,
+  "ai": {
+    "profiles": {
+      "assistant": {
+        "type": "text",
+        "modelPolicy": "balanced",
+        "systemPrompt": "prompts/assistant.md",
+        "stream": true,
+        "maxInputChars": 12000,
+        "maxOutputTokens": 2000
+      },
+      "illustration": {
+        "type": "image",
+        "modelPolicy": "image-standard",
+        "sizes": ["1024x1024", "1536x1024", "1024x1536"],
+        "quality": "auto",
+        "maxPromptChars": 8000,
+        "maxImages": 1
+      }
+    }
+  }
+}

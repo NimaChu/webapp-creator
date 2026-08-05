@@ -1,59 +1,62 @@
-# Quality Checklist
+# Frontend Quality Checklist
 
-## Product
+Use this checklist after implementation and before delivery.
 
-- The primary task is available immediately.
-- Real domain language replaces starter copy.
-- All decision-relevant source content is represented; nothing is silently dropped to fit a preset card, section, step, or slide count.
-- Metrics, examples, trends, citations, and conclusions come from user input or actual computation; intentional sample data is clearly labeled.
-- Every visible control works.
-- Empty, valid, invalid, working, success, error, and reset states are handled as needed.
-- Copy, download, import, export, and persistence behavior is honest.
+## Product And Content
 
-## Portability
+- The first viewport exposes the real task, not marketing copy.
+- Labels and commands use the user's vocabulary and active verbs.
+- Realistic content has tested wrapping, overflow, empty values, and long labels.
+- Empty states explain the next useful action.
+- Error states say what failed and how to recover.
+- Loading states preserve layout and identify what is working.
 
-- `index.html` is the entry.
-- Required assets are local or embedded.
-- Root-absolute asset paths are absent.
-- External dependencies are removed unless the user explicitly accepts them.
-- No credential or machine-specific path appears in delivered files.
-- `.webapp.local.json` is excluded from archives.
+## Structure And State
 
-## Interaction
+- Use local state for component-specific interaction and URL state for shareable filters or views.
+- Separate data transformation from DOM rendering when logic is nontrivial.
+- Keep repeated render functions focused; split a large script into local modules or files before it becomes difficult to inspect.
+- Use a framework only when routing, complex shared state, or an existing component system justifies it.
+- Preserve user input after recoverable errors.
 
-- Controls have labels and correct button types.
-- Focus remains visible and keyboard order is logical.
-- Touch targets are large enough.
-- Errors preserve recoverable input.
-- Async work prevents duplicate submission and supports cancellation when useful.
-- Model output is rendered as untrusted content.
-- Normal text and essential control text meet a contrast ratio of at least 4.5:1.
-- Color is not the only signal for state or validation.
+## Visual System
 
-## Responsive
+- Use semantic color, spacing, type, radius, and motion tokens.
+- Follow one spacing scale instead of arbitrary values.
+- Keep heading levels meaningful and do not style body text as headings.
+- Direct-label important values; add legends only when needed.
+- Use icons, text, shape, or line style alongside color for status meaning.
+- Remove generic hero sections, excessive centered layouts, uniform card grids, heavy shadows, and decorative gradients.
+- Keep one subject-relevant visual signature and make the surrounding interface quiet.
 
-- Test at 1440×900, 390×844, and 320 px wide.
-- No unintended horizontal page overflow exists.
-- Labels, buttons, charts, canvases, and tables remain usable.
-- Charts have an explicit responsive height or `min-height` and do not trigger resize loops.
-- The primary action appears early on mobile.
-- Reduced-motion mode still communicates state.
+## Accessibility
 
-## Delivery
+- Every control works with a keyboard and has a visible focus state.
+- Every form control has a visible label or accessible name.
+- Icon-only controls have an accessible name and tooltip.
+- Dialogs move focus inside, keep it trapped, and restore focus on close.
+- Normal text meets 4.5:1 contrast; large text and essential graphics meet 3:1.
+- Status does not rely on color alone.
+- Dynamic results use an appropriate live region without announcing every minor change.
+- Motion respects `prefers-reduced-motion`.
 
-- Chinese interfaces use a local CJK-first font stack with system fallbacks.
-- Run `python3 scripts/webapp.py validate <target> --strict`.
-- Exercise the primary workflow in a real browser.
-- Remove placeholder content, dead code, debug output, and fake data not explicitly labeled as sample data.
-- Build the archive and inspect its file list when a zip is requested.
+## Responsive And Runtime
 
-## Presentations
+- Verify at 320 px, 390x844, 768 px, 1024 px, and 1440x900.
+- No page-level horizontal scrolling, overlap, clipped labels, or text outside controls.
+- Tables have an intentional narrow-screen strategy.
+- Charts and canvases have stable dimensions and render nonblank pixels.
+- The browser console has no uncaught errors.
+- Empty, realistic, invalid, reset, copy/download, and asynchronous failure paths work.
+- External dependencies are intentional, disclosed, and compatible with offline requirements.
 
-- The audience, outcome, venue, duration, narrative, and brand status are explicit.
-- The active brand pack owns stable colors, fonts, logo treatment, and approved layouts; slide-local CSS does not silently contradict it.
-- Every slide has one job, a unique `data-slide-id`, a registered `data-layout`, a semantic heading, and a `data-title`.
-- Fixed-stage decks preserve one 16:9 composition at every viewport; responsive decks are deliberately tested as reflowing reading experiences.
-- Local images declare a named ratio slot such as `hero-16x9`; generated images do not contain duplicated slide chrome.
-- Exactly one slide starts active; inactive slides are hidden from interaction with `aria-hidden` and `inert`.
-- Keyboard, wheel, swipe, boundary states, progress, deep links, fullscreen fallback, reduced motion, and print output work.
-- Run `python3 scripts/webapp.py validate <deck> --strict --rendered` when Playwright is available, then visually inspect every slide.
+## Presentation Delivery
+
+- The deck has a clear audience, outcome, narrative arc, and speaking-time target.
+- Each slide makes one primary point and uses a composition suited to its evidence.
+- Buttons, keyboard, wheel, swipe, Home/End, and direct `#slide-N` links reach the correct slide.
+- Inactive slides are hidden from assistive interaction; the current slide remains readable and focusable.
+- Counter, progress, boundary states, notes, and fullscreen fallback work without layout shift.
+- Chinese-English switching updates all visible copy, document titles, controls, accessible labels, and speaker notes without missing keys or mixed-language residue.
+- Print/PDF output places one complete slide on each page.
+- The visual system belongs to the subject and is not an unchanged starter theme.

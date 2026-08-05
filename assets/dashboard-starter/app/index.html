@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --page: #f3f6f8;
+      --surface: #ffffff;
+      --surface-blue: #edf3f8;
+      --text: #17202a;
+      --muted: #617181;
+      --line: #d5dee5;
+      --blue: #1e467d;
+      --blue-strong: #15365f;
+      --green: #2f7548;
+      --green-soft: #e8f2eb;
+      --amber: #8b6515;
+      font-family: Arial, "Microsoft YaHei UI", sans-serif;
+      color: var(--text);
+      background: var(--page);
+      font-variant-numeric: tabular-nums;
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; margin: 0; }
+    button, select { font: inherit; }
+    button:focus-visible, select:focus-visible { outline: 3px solid #78a8cf; outline-offset: 2px; }
+    .topbar { border-bottom: 1px solid #c9d5de; background: var(--blue-strong); color: #ffffff; }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(1320px, calc(100% - 40px)); min-height: 66px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 20px; letter-spacing: 0; }
+    .top-summary { margin: 4px 0 0; color: #d6e1eb; font-size: 12px; }
+    .scope { display: flex; align-items: end; gap: 10px; }
+    .field { display: grid; gap: 5px; color: #d6e1eb; font-size: 11px; font-weight: 700; }
+    select { min-height: 38px; padding: 0 32px 0 10px; border: 1px solid #7890a5; border-radius: 6px; color: var(--text); background: #ffffff; }
+    .shell { width: min(1320px, calc(100% - 40px)); margin: 0 auto; padding: 18px 0 42px; }
+    .meta { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 14px; color: var(--muted); font-size: 11px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .kpi { min-width: 0; padding: 16px 18px; border-right: 1px solid var(--line); }
+    .kpi:last-child { border-right: 0; }
+    .kpi-label { color: var(--muted); font-size: 11px; }
+    .kpi-value { margin-top: 7px; font-size: 25px; font-weight: 700; }
+    .kpi-note { margin-top: 4px; color: var(--green); font-size: 11px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.75fr); gap: 14px; margin-top: 14px; }
+    .panel { min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .panel-head { padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+    h2 { margin: 0; font-size: 15px; letter-spacing: 0; }
+    .panel-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .bars { display: grid; gap: 14px; padding: 20px 18px 22px; }
+    .bar-row { display: grid; grid-template-columns: minmax(92px, 140px) minmax(120px, 1fr) 64px; gap: 12px; align-items: center; font-size: 12px; }
+    .bar-track { height: 10px; overflow: hidden; background: #e6ece9; }
+    .bar-value { height: 100%; background: var(--green); }
+    .bar-number { text-align: right; font-weight: 700; }
+    .attention { padding: 8px 18px 18px; margin: 0; list-style: none; }
+    .attention li { padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .attention li:last-child { border-bottom: 0; }
+    .attention strong { display: block; font-size: 12px; }
+    .attention span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .attention .flag { color: var(--amber); }
+    .table-panel { margin-top: 14px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 11px 18px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+    th { color: var(--muted); font-size: 11px; background: #f7f9fa; }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.num, th.num { text-align: right; }
+    .status { display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; color: var(--green); background: var(--green-soft); font-size: 11px; font-weight: 700; }
+    @media (max-width: 920px) {
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi:nth-child(2) { border-right: 0; }
+      .kpi:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .topbar-inner, .shell { width: calc(100% - 24px); }
+      .topbar-inner { display: block; padding: 14px 0; }
+      .scope { margin-top: 12px; }
+      .kpis { grid-template-columns: 1fr; }
+      .kpi { border-right: 0; border-bottom: 1px solid var(--line); }
+      .kpi:nth-child(2) { border-bottom: 1px solid var(--line); }
+      .kpi:last-child { border-bottom: 0; }
+      .bar-row { grid-template-columns: 82px minmax(80px, 1fr) 52px; gap: 8px; }
+      th, td { padding-inline: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div><h1>__TITLE__</h1><p class="top-summary">__SUMMARY__</p></div>
+      <div class="scope">
+        <label class="field" for="periodSelect">分析范围
+          <select id="periodSelect">
+            <option value="month">本月</option>
+            <option value="quarter">本季度</option>
+            <option value="year">本年度</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </header>
+  <main class="shell">
+    <div class="meta"><span>示例数据，请替换为实际业务数据</span><span>更新时间：<time id="updatedAt"></time></span></div>
+    <section class="kpis" aria-label="关键指标" id="kpis"></section>
+    <div class="layout">
+      <section class="panel" aria-labelledby="comparisonTitle">
+        <div class="panel-head"><h2 id="comparisonTitle">分类对比</h2><p class="panel-subtitle">当前范围内的事项数量</p></div>
+        <div class="bars" id="bars" role="img" aria-label="分类数量横向条形图"></div>
+      </section>
+      <aside class="panel" aria-labelledby="attentionTitle">
+        <div class="panel-head"><h2 id="attentionTitle">需要关注</h2><p class="panel-subtitle">影响当前判断的变化与例外</p></div>
+        <ul class="attention" id="attention"></ul>
+      </aside>
+    </div>
+    <section class="panel table-panel" aria-labelledby="detailTitle">
+      <div class="panel-head"><h2 id="detailTitle">明细</h2><p class="panel-subtitle">用于核对精确值和责任归属</p></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>项目</th><th>负责人</th><th>状态</th><th class="num">数量</th></tr></thead>
+          <tbody id="detailRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script>
+    const dataByPeriod = {
+      month: { kpis: [['总量', 128, '较上月 +8.5%'], ['完成率', 0.84, '目标 80%'], ['处理中', 17, '5 项临近期限'], ['平均周期', 4.2, '单位：天']], bars: [['流程优化', 46], ['知识整理', 34], ['工具建设', 28], ['培训支持', 20]], attention: [['完成率高于目标', '当前完成率为 84%。', false], ['工具建设增长', '较上一范围增加 6 项。', false], ['临期事项', '5 项任务将在三个工作日内到期。', true]], rows: [['示例项目 A', 'Team A', '进行中', 38], ['示例项目 B', 'Team B', '已完成', 34], ['示例项目 C', 'Team C', '待确认', 31], ['示例项目 D', 'Team D', '已完成', 25]] },
+      quarter: { kpis: [['总量', 362, '较上季度 +5.2%'], ['完成率', 0.81, '目标 80%'], ['处理中', 43, '12 项临近期限'], ['平均周期', 4.8, '单位：天']], bars: [['流程优化', 132], ['知识整理', 96], ['工具建设', 78], ['培训支持', 56]], attention: [['完成率保持稳定', '当前完成率为 81%。', false], ['流程优化占比最高', '占全部事项的 36.5%。', false], ['周期仍有空间', '平均周期比目标高 0.8 天。', true]], rows: [['示例项目 A', 'Team A', '进行中', 108], ['示例项目 B', 'Team B', '已完成', 96], ['示例项目 C', 'Team C', '待确认', 84], ['示例项目 D', 'Team D', '已完成', 74]] },
+      year: { kpis: [['总量', 1418, '较上年度 +11.0%'], ['完成率', 0.79, '目标 80%'], ['处理中', 126, '31 项临近期限'], ['平均周期', 5.1, '单位：天']], bars: [['流程优化', 512], ['知识整理', 386], ['工具建设', 302], ['培训支持', 218]], attention: [['年度总量增长', '较上一年度增加 11.0%。', false], ['完成率接近目标', '距离目标还差 1 个百分点。', true], ['优先处理积压', '处理中事项集中在两个分类。', true]], rows: [['示例项目 A', 'Team A', '进行中', 420], ['示例项目 B', 'Team B', '已完成', 368], ['示例项目 C', 'Team C', '待确认', 332], ['示例项目 D', 'Team D', '已完成', 298]] }
+    }
+    const integer = new Intl.NumberFormat('zh-CN')
+    const percent = new Intl.NumberFormat('zh-CN', { style: 'percent', maximumFractionDigits: 1 })
+
+    function render(key) {
+      const data = dataByPeriod[key]
+      document.querySelector('#kpis').replaceChildren(...data.kpis.map(([label, value, note]) => {
+        const node = document.createElement('article')
+        node.className = 'kpi'
+        node.innerHTML = `<div class="kpi-label">${label}</div><div class="kpi-value">${value < 1 ? percent.format(value) : integer.format(value)}</div><div class="kpi-note">${note}</div>`
+        return node
+      }))
+      const max = Math.max(...data.bars.map(([, value]) => value))
+      document.querySelector('#bars').replaceChildren(...data.bars.map(([label, value]) => {
+        const node = document.createElement('div')
+        node.className = 'bar-row'
+        node.innerHTML = `<span>${label}</span><div class="bar-track"><div class="bar-value" style="width:${value / max * 100}%"></div></div><span class="bar-number">${integer.format(value)}</span>`
+        return node
+      }))
+      document.querySelector('#attention').replaceChildren(...data.attention.map(([title, detail, flag]) => {
+        const node = document.createElement('li')
+        node.innerHTML = `<strong class="${flag ? 'flag' : ''}">${title}</strong><span>${detail}</span>`
+        return node
+      }))
+      document.querySelector('#detailRows').replaceChildren(...data.rows.map(([name, owner, status, value]) => {
+        const row = document.createElement('tr')
+        row.innerHTML = `<td>${name}</td><td>${owner}</td><td><span class="status">${status}</span></td><td class="num">${integer.format(value)}</td>`
+        return row
+      }))
+    }
+
+    document.querySelector('#updatedAt').textContent = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date())
+    document.querySelector('#periodSelect').addEventListener('change', event => render(event.target.value))
+    render('month')
+  </script>
+</body>
+</html>

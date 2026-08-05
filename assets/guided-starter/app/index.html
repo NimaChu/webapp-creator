@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --page: #f4f6f5;
+      --surface: #ffffff;
+      --soft: #edf3f0;
+      --text: #17201c;
+      --muted: #617069;
+      --line: #d3dcd7;
+      --green: #2f7548;
+      --green-strong: #245d39;
+      --blue: #1e467d;
+      --warning: #8a6515;
+      font-family: Arial, "Microsoft YaHei UI", sans-serif;
+      color: var(--text);
+      background: var(--page);
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; margin: 0; }
+    button, input, select, textarea { font: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #78a8cf; outline-offset: 2px; }
+    .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 44px; }
+    .header { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    h1 { margin: 0; font-size: 25px; letter-spacing: 0; }
+    .summary { max-width: 760px; margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .workflow { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 580px; margin-top: 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .rail { padding: 22px 18px; border-right: 1px solid var(--line); background: #f8faf9; }
+    .rail-title { margin: 0 0 18px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .steps { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+    .step { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px; border-left: 3px solid transparent; color: var(--muted); }
+    .step-number { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 11px; font-weight: 700; }
+    .step strong { display: block; color: inherit; font-size: 12px; }
+    .step span:last-child { display: block; margin-top: 2px; font-size: 10px; line-height: 1.35; }
+    .step.active { border-left-color: var(--blue); color: var(--blue); background: #edf3f8; }
+    .step.done { color: var(--green); }
+    .content { display: flex; min-width: 0; flex-direction: column; padding: 24px 28px; }
+    .progress { height: 4px; overflow: hidden; background: #e3e9e6; }
+    .progress-value { width: 33.333%; height: 100%; background: var(--green); transition: width 160ms ease; }
+    .step-panel { flex: 1; padding-top: 24px; }
+    h2 { margin: 0; font-size: 19px; letter-spacing: 0; }
+    .lead { margin: 7px 0 20px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .field { display: grid; gap: 7px; min-width: 0; }
+    .field.wide { grid-column: 1 / -1; }
+    label, legend { font-size: 12px; font-weight: 700; }
+    input, select, textarea { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #afbeb6; border-radius: 6px; color: var(--text); background: var(--surface); }
+    textarea { min-height: 130px; resize: vertical; line-height: 1.5; }
+    fieldset { grid-column: 1 / -1; padding: 14px; border: 1px solid var(--line); border-radius: 6px; }
+    legend { padding: 0 5px; }
+    .choice-row { display: flex; flex-wrap: wrap; gap: 12px 18px; }
+    .choice { display: inline-flex; align-items: center; gap: 7px; font-weight: 400; }
+    .choice input { width: 17px; min-height: 17px; margin: 0; }
+    .review { display: grid; gap: 10px; padding: 16px; border-left: 3px solid var(--green); background: var(--soft); }
+    .review-row { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; font-size: 12px; line-height: 1.5; }
+    .review-row span:first-child { color: var(--muted); }
+    .footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .message { margin: 0; color: var(--warning); font-size: 12px; }
+    .actions { display: flex; gap: 8px; }
+    button { min-height: 40px; padding: 0 15px; border: 1px solid transparent; border-radius: 6px; color: #ffffff; background: var(--green); font-weight: 700; cursor: pointer; transition: background-color 120ms ease; }
+    button:hover { background: var(--green-strong); }
+    button.secondary { border-color: var(--line); color: var(--text); background: var(--surface); }
+    button.secondary:hover { background: var(--soft); }
+    [hidden] { display: none !important; }
+    @media (max-width: 760px) {
+      .shell { width: calc(100% - 24px); padding-top: 20px; }
+      .workflow { grid-template-columns: 1fr; }
+      .rail { padding: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .rail-title { margin-bottom: 8px; }
+      .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .step { display: block; padding: 8px; border-left: 0; border-bottom: 3px solid transparent; }
+      .step.active { border-bottom-color: var(--blue); }
+      .step-number { margin-bottom: 6px; }
+      .step span:last-child { display: none; }
+      .content { padding: 20px; }
+    }
+    @media (max-width: 500px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field.wide, fieldset { grid-column: auto; }
+      .review-row { grid-template-columns: 1fr; gap: 3px; }
+      .footer { align-items: stretch; flex-direction: column; }
+      .actions { justify-content: flex-end; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="header"><h1>__TITLE__</h1><p class="summary">__SUMMARY__</p></header>
+    <div class="workflow">
+      <nav class="rail" aria-label="任务步骤">
+        <p class="rail-title">完成进度</p>
+        <ol class="steps">
+          <li class="step active" data-step-marker="1"><span class="step-number">1</span><div><strong>明确目标</strong><span>说明要完成的任务</span></div></li>
+          <li class="step" data-step-marker="2"><span class="step-number">2</span><div><strong>设置条件</strong><span>补充范围和优先级</span></div></li>
+          <li class="step" data-step-marker="3"><span class="step-number">3</span><div><strong>检查提交</strong><span>确认信息并执行</span></div></li>
+        </ol>
+      </nav>
+      <section class="content" aria-label="任务表单">
+        <div class="progress" aria-hidden="true"><div class="progress-value" id="progressValue"></div></div>
+        <div class="step-panel" data-step-panel="1">
+          <h2>明确要完成的任务</h2><p class="lead">先写清结果，再补充必要背景。输入内容会在最后一步汇总。</p>
+          <div class="form-grid">
+            <div class="field wide"><label for="goalInput">目标</label><input id="goalInput" placeholder="例如：整理本周项目风险并形成行动清单"></div>
+            <div class="field wide"><label for="contextInput">背景</label><textarea id="contextInput" placeholder="补充已有信息、相关人员或当前状态"></textarea></div>
+          </div>
+        </div>
+        <div class="step-panel" data-step-panel="2" hidden>
+          <h2>设置处理条件</h2><p class="lead">只保留会影响结果的设置，减少不必要的配置。</p>
+          <div class="form-grid">
+            <div class="field"><label for="scopeSelect">范围</label><select id="scopeSelect"><option>当前项目</option><option>当前团队</option><option>自定义范围</option></select></div>
+            <div class="field"><label for="prioritySelect">优先级</label><select id="prioritySelect"><option>常规</option><option>优先</option><option>紧急</option></select></div>
+            <fieldset><legend>输出内容</legend><div class="choice-row"><label class="choice"><input type="checkbox" value="摘要" aria-label="包含摘要" checked>摘要</label><label class="choice"><input type="checkbox" value="风险" aria-label="包含风险" checked>风险</label><label class="choice"><input type="checkbox" value="行动项" aria-label="包含行动项" checked>行动项</label></div></fieldset>
+          </div>
+        </div>
+        <div class="step-panel" data-step-panel="3" hidden>
+          <h2>检查并提交</h2><p class="lead">确认下面的信息符合实际任务，再执行后续处理。</p>
+          <div class="review" id="review" aria-live="polite"></div>
+        </div>
+        <footer class="footer">
+          <p class="message" id="message" aria-live="polite"></p>
+          <div class="actions"><button id="backButton" class="secondary" type="button" hidden>上一步</button><button id="nextButton" type="button">下一步</button></div>
+        </footer>
+      </section>
+    </div>
+  </main>
+  <script>
+    let currentStep = 1
+    const goal = document.querySelector('#goalInput')
+    const message = document.querySelector('#message')
+    const nextButton = document.querySelector('#nextButton')
+    const backButton = document.querySelector('#backButton')
+
+    function updateReview() {
+      const outputs = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(node => node.value).join('、') || '未选择'
+      const values = [['目标', goal.value.trim() || '未填写'], ['背景', document.querySelector('#contextInput').value.trim() || '未填写'], ['范围', document.querySelector('#scopeSelect').value], ['优先级', document.querySelector('#prioritySelect').value], ['输出内容', outputs]]
+      document.querySelector('#review').replaceChildren(...values.map(([label, value]) => {
+        const row = document.createElement('div')
+        row.className = 'review-row'
+        const key = document.createElement('span')
+        const content = document.createElement('span')
+        key.textContent = label
+        content.textContent = value
+        row.append(key, content)
+        return row
+      }))
+    }
+
+    function showStep(step) {
+      currentStep = step
+      document.querySelectorAll('[data-step-panel]').forEach(node => { node.hidden = Number(node.dataset.stepPanel) !== step })
+      document.querySelectorAll('[data-step-marker]').forEach(node => {
+        const marker = Number(node.dataset.stepMarker)
+        node.classList.toggle('active', marker === step)
+        node.classList.toggle('done', marker < step)
+      })
+      document.querySelector('#progressValue').style.width = `${step / 3 * 100}%`
+      backButton.hidden = step === 1
+      nextButton.textContent = step === 3 ? '确认提交' : '下一步'
+      message.textContent = ''
+      if (step === 3) updateReview()
+    }
+
+    nextButton.addEventListener('click', () => {
+      if (currentStep === 1 && !goal.value.trim()) {
+        message.textContent = '请先填写任务目标。'
+        goal.focus()
+        return
+      }
+      if (currentStep < 3) showStep(currentStep + 1)
+      else message.textContent = '信息已确认，请用实际业务逻辑替换示例提交动作。'
+    })
+    backButton.addEventListener('click', () => showStep(Math.max(1, currentStep - 1)))
+  </script>
+</body>
+</html>

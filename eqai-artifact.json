@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "slug": "kostal/skills/html-design",
+  "type": "Agent Skill",
+  "name": "html-design",
+  "owner": "kostal/skills",
+  "version": "0.1.3",
+  "summary": "创建、改版和验证单文件 HTML 工具、数据分析台、支持中英文切换且可替代 PPT 的网页演示文稿，以及接入 Eqai 文本与生图能力的 AI 工具。",
+  "summaryEn": "Creates and validates single-file HTML tools, analytics dashboards, bilingual web presentations that can replace PPT, and Eqai AI-enabled interfaces.",
+  "status": "Preview",
+  "sourcePath": "skills_hub/html-design",
+  "os": [
+    "Windows",
+    "Linux",
+    "macOS"
+  ],
+  "tags": [
+    "Agent Skill",
+    "HTML design",
+    "HTML presentation",
+    "Chinese-English",
+    "responsive UI"
+  ],
+  "installCommand": "opencode eqai install kostal/skills/html-design",
+  "authorName": "chu002",
+  "sourceRepository": "",
+  "sourceRef": "",
+  "packageUrl": "/packages/kostal/skills/html-design.zip",
+  "updated": "2026-07-23T05:07:17.236Z"
+}
