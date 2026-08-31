@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "contracts": [
+    {
+      "id": "tool-workbench",
+      "kind": "tool",
+      "leadRole": "interaction engineer",
+      "designRead": "A repeated utility for task-focused operators; speed, reversibility, and honest output are the visual language.",
+      "dials": {"variance": 4, "motion": 2, "density": 7},
+      "signatureQuestion": "What transformation or inspection view would make this tool unmistakably about its subject?",
+      "directionAxes": ["single-task versus batch", "compact versus explanatory", "live preview versus explicit run"],
+      "requiredMarkers": ["data-tool-input", "data-tool-output", "data-primary-action", "data-reset-state", "data-example-input"],
+      "failureModes": ["generic textarea wrapper", "fake processing", "output actions detached from output", "missing invalid and reset states"]
+    },
+    {
+      "id": "dashboard-decision",
+      "kind": "dashboard",
+      "leadRole": "information designer",
+      "designRead": "A decision surface for an operator; comparisons, thresholds, provenance, and exceptions outrank decorative metrics.",
+      "dials": {"variance": 3, "motion": 2, "density": 8},
+      "signatureQuestion": "Which threshold or exception changes the next decision?",
+      "directionAxes": ["overview versus exception-first", "trend versus cohort", "monitoring versus review"],
+      "requiredMarkers": ["data-dashboard-decision", "data-unit", "data-period", "data-threshold", "data-exception", "data-sample-data", "data-source-note"],
+      "failureModes": ["unlabeled sample metrics", "four decorative KPI cards", "charts without units", "no actionable exception path"]
+    },
+    {
+      "id": "guided-decision",
+      "kind": "guided",
+      "leadRole": "service designer",
+      "designRead": "A confidence-building decision flow; each step changes what comes next and the review makes consequences visible.",
+      "dials": {"variance": 3, "motion": 3, "density": 5},
+      "signatureQuestion": "What branch, risk, or commitment must the user understand before continuing?",
+      "directionAxes": ["linear versus branching", "form-led versus conversational", "fast path versus assisted path"],
+      "requiredMarkers": ["data-guided-progress", "data-guided-branch", "data-inline-error", "data-guided-review", "data-edit-step", "data-reset-state"],
+      "failureModes": ["generic three-step form", "progress without semantics", "validation only at the end", "review without edit or reset"]
+    },
+    {
+      "id": "knowledge-retrieval",
+      "kind": "knowledge",
+      "leadRole": "information architect",
+      "designRead": "A retrieval-first reference for readers under time pressure; taxonomy, search feedback, evidence labels, and stable anchors lead.",
+      "dials": {"variance": 4, "motion": 1, "density": 6},
+      "signatureQuestion": "Which taxonomy, timeline, glossary, or evidence treatment makes the subject easier to retrieve?",
+      "directionAxes": ["task taxonomy versus audience taxonomy", "scan-first versus read-first", "FAQ versus handbook"],
+      "requiredMarkers": ["data-knowledge-search", "data-result-count", "data-knowledge-taxonomy", "data-knowledge-entry", "data-source-status", "data-empty-state"],
+      "failureModes": ["generic FAQ accordion", "search with no result feedback", "categories unrelated to domain", "answers without source status"]
+    },
+    {
+      "id": "game-complete-loop",
+      "kind": "game",
+      "leadRole": "game designer",
+      "designRead": "A compact play loop with one memorable mechanic; objective, feedback, failure, completion, replay, and fair input are visible.",
+      "dials": {"variance": 7, "motion": 7, "density": 4},
+      "signatureQuestion": "What mechanic and visual response could not be swapped into an unrelated game?",
+      "directionAxes": ["arcade versus puzzle", "score chase versus completion", "continuous input versus discrete turns"],
+      "requiredMarkers": ["data-game-objective", "data-game-state", "data-game-controls", "data-game-result", "data-game-restart", "visibilitychange", "localStorage"],
+      "failureModes": ["theme unrelated to mechanic", "no pause on hidden tab", "pointer-only controls", "score with no ending or replay"]
+    },
+    {
+      "id": "presentation-decision-story",
+      "kind": "presentation",
+      "leadRole": "editorial director",
+      "designRead": "A projected decision narrative; every slide has one job and the rhythm moves from tension to evidence to a concrete decision.",
+      "dials": {"variance": 6, "motion": 3, "density": 4},
+      "signatureQuestion": "What visual relationship makes the argument legible from the back of the room?",
+      "directionAxes": ["evidence-led versus narrative-led", "editorial versus diagrammatic", "sparse keynote versus executive review"],
+      "requiredMarkers": ["data-presentation-outcome", "data-narrative-role", "data-layout=\"comparison\"", "data-layout=\"evidence\"", "data-layout=\"closing\"", "data-decision-owner"],
+      "failureModes": ["website sections disguised as slides", "three repeated card layouts", "evidence without conclusion", "close without owner or next action"]
+    }
+  ]
+}

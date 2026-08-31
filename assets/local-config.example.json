@@ -1,0 +1,14 @@
+{
+  "chat": {
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "model": "replace-with-your-local-model",
+    "apiKeyEnv": "",
+    "timeoutSeconds": 120
+  },
+  "image": {
+    "baseUrl": "http://127.0.0.1:8188/v1",
+    "model": "replace-with-your-image-model",
+    "apiKeyEnv": "",
+    "timeoutSeconds": 180
+  }
+}

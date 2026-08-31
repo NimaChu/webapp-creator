@@ -1,0 +1,21 @@
+{
+  "name": "Neutral Corporate",
+  "visualSystem": "neutral-corporate",
+  "colors": {
+    "background": "#E8EBEF",
+    "surface": "#FFFFFF",
+    "text": "#17202B",
+    "muted": "#5D6978",
+    "primary": "#245A8D",
+    "secondary": "#DCE7F1",
+    "line": "#C8D0D9"
+  },
+  "fonts": {
+    "display": "Arial, sans-serif",
+    "body": "Arial, sans-serif",
+    "data": "Consolas, monospace"
+  },
+  "logo": "",
+  "layouts": ["cover", "section", "statement", "split", "comparison", "process", "timeline", "metrics", "evidence", "gallery", "diagram", "closing"],
+  "customCss": "brand.css"
+}

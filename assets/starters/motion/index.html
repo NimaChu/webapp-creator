@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --bg: #08110E;
+      --surface: #101C17;
+      --text: #D7FBE8;
+      --muted: #79A98F;
+      --accent: #42F59E;
+      --secondary: #F3C94C;
+      --line: #28513F;
+      --display-font: ui-monospace, SFMono-Regular, Consolas, monospace;
+      --body-font: ui-monospace, SFMono-Regular, Consolas, monospace;
+      --data-font: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: var(--body-font);
+    }
+    button, input { font: inherit; }
+    button {
+      min-height: 42px;
+      padding: 0 16px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      cursor: pointer;
+    }
+    button:hover, button:focus-visible { color: var(--bg); background: var(--accent); outline: none; }
+    button:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 44px; }
+    .masthead { display: flex; justify-content: space-between; gap: 24px; align-items: end; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .eyebrow { margin: 0 0 8px; color: var(--accent); font: 0.72rem/1 var(--data-font); letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 760px; color: var(--text); font: clamp(2rem, 5vw, 5.2rem)/.94 var(--display-font); letter-spacing: -.08em; text-transform: uppercase; }
+    .meta { color: var(--muted); font-size: .76rem; line-height: 1.5; text-align: right; }
+    .motion-stage { position: relative; min-height: 520px; margin: 22px 0 16px; overflow: hidden; background: radial-gradient(circle at 50% 46%, #153C2A, var(--surface) 42%, var(--bg) 80%); border: 1px solid var(--line); }
+    .motion-stage::before, .motion-stage::after { position: absolute; content: ""; pointer-events: none; }
+    .motion-stage::before { inset: 0; opacity: .28; background: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 48px 48px; }
+    .motion-stage::after { inset: 0; opacity: .13; background: repeating-linear-gradient(0deg, transparent 0 5px, var(--accent) 6px 7px); mix-blend-mode: screen; }
+    .stage-label { position: absolute; z-index: 3; top: 18px; left: 20px; color: var(--muted); font: .72rem/1 var(--data-font); letter-spacing: .12em; }
+    .stage-readout { position: absolute; z-index: 3; right: 20px; bottom: 18px; color: var(--accent); font: .72rem/1 var(--data-font); letter-spacing: .1em; }
+    .grid-node { position: absolute; z-index: 2; width: 18px; height: 18px; background: var(--accent); border: 4px solid var(--bg); box-shadow: 0 0 0 1px var(--accent), 0 0 22px var(--accent); transform: translate(-50%, -50%); }
+    .node-a { left: 17%; top: 72%; }
+    .node-b { left: 38%; top: 28%; background: var(--secondary); box-shadow: 0 0 0 1px var(--secondary), 0 0 22px var(--secondary); }
+    .node-c { left: 66%; top: 62%; }
+    .node-d { left: 84%; top: 24%; background: var(--secondary); box-shadow: 0 0 0 1px var(--secondary), 0 0 22px var(--secondary); }
+    .route { position: absolute; z-index: 1; height: 2px; transform-origin: left center; background: var(--accent); box-shadow: 0 0 12px var(--accent); opacity: .3; }
+    .route-a { left: 17%; top: 72%; width: 29%; transform: rotate(-38deg); }
+    .route-b { left: 38%; top: 28%; width: 33%; transform: rotate(36deg); }
+    .route-c { left: 66%; top: 62%; width: 28%; transform: rotate(-41deg); }
+    .packet { position: absolute; z-index: 3; left: 16%; top: 71%; width: 12px; height: 12px; background: #fff; box-shadow: 0 0 16px 4px var(--accent); transform: translate(-50%, -50%); opacity: 0; }
+    .pulse { position: absolute; z-index: 1; left: 17%; top: 72%; width: 24px; height: 24px; border: 1px solid var(--accent); transform: translate(-50%, -50%); opacity: 0; }
+    .scan { position: absolute; z-index: 2; top: 0; bottom: 0; left: 18%; width: 2px; background: var(--secondary); box-shadow: 0 0 20px 2px var(--secondary); opacity: 0; }
+    .motion-stage.is-playing .route { animation: route-on 1.6s ease-in-out infinite alternate; }
+    .motion-stage.is-playing .packet { animation: packet-run 6s linear infinite; }
+    .motion-stage.is-playing .pulse { animation: pulse-out 2s ease-out infinite; }
+    .motion-stage.is-playing .scan { animation: scan-sweep 6s linear infinite; }
+    @keyframes route-on { from { opacity: .25; } to { opacity: 1; } }
+    @keyframes packet-run { 0%, 8% { left: 17%; top: 72%; opacity: 0; } 12% { opacity: 1; } 35% { left: 38%; top: 28%; } 63% { left: 66%; top: 62%; } 90% { left: 84%; top: 24%; opacity: 1; } 100% { left: 84%; top: 24%; opacity: 0; } }
+    @keyframes pulse-out { 0% { width: 20px; height: 20px; opacity: .85; } 100% { width: 150px; height: 150px; opacity: 0; } }
+    @keyframes scan-sweep { 0%, 8% { left: 17%; opacity: 0; } 12% { opacity: .9; } 90% { left: 84%; opacity: .9; } 100% { left: 84%; opacity: 0; } }
+    .motion-stage.is-paused * { animation-play-state: paused !important; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-bar { position: relative; height: 8px; background: var(--surface); border: 1px solid var(--line); }
+    .timeline-progress { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 12px var(--accent); transition: width .08s linear; }
+    .timeline-ticks { display: flex; justify-content: space-between; color: var(--muted); font: .68rem/1 var(--data-font); }
+    .timeline-ticks button { min-height: 28px; padding: 0; color: var(--muted); background: transparent; border: 0; }
+    .timeline-ticks button:hover, .timeline-ticks button:focus-visible { color: var(--accent); background: transparent; box-shadow: none; }
+    .controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 16px; }
+    .control-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .scene-copy { max-width: 600px; color: var(--muted); font-size: .9rem; line-height: 1.6; }
+    .story-summary { max-width: 50ch; margin: 18px 0 0; color: var(--muted); line-height: 1.55; }
+    .scene-copy strong { color: var(--text); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+      .motion-stage.is-playing .packet { left: 84%; top: 24%; opacity: 1; }
+      .motion-stage.is-playing .route, .motion-stage.is-playing .pulse, .motion-stage.is-playing .scan { opacity: .7; }
+    }
+    @media (max-width: 680px) {
+      main { width: min(100% - 20px, 1180px); padding-top: 20px; }
+      .masthead, .controls { align-items: start; flex-direction: column; }
+      .meta { text-align: left; }
+      .motion-stage { min-height: 430px; }
+    }
+    __STYLE_CSS__
+  </style>
+</head>
+<body data-webapp-kind="motion" data-deliverable-type="__DELIVERABLE__" data-style="__STYLE_ID__" data-ai-capabilities="__AI_CAPABILITIES__">
+  <main>
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">MOTION STUDY / 04 SCENES</p>
+        <h1>__TITLE__</h1>
+        <p class="story-summary">__SUMMARY__</p>
+      </div>
+      <div class="meta">时间轴原型<br>6.0 SEC LOOP / LOCAL HTML</div>
+    </header>
+
+    <section class="motion-stage is-playing" id="stage" data-motion-story aria-label="城市电网负荷迁移动画舞台">
+      <div class="stage-label" id="sceneLabel">SCENE 01 / DETECT</div>
+      <div class="stage-readout" id="readout">LOAD 74% // STABLE</div>
+      <i class="route route-a" aria-hidden="true"></i>
+      <i class="route route-b" aria-hidden="true"></i>
+      <i class="route route-c" aria-hidden="true"></i>
+      <i class="grid-node node-a" aria-hidden="true"></i>
+      <i class="grid-node node-b" aria-hidden="true"></i>
+      <i class="grid-node node-c" aria-hidden="true"></i>
+      <i class="grid-node node-d" aria-hidden="true"></i>
+      <i class="packet" aria-hidden="true"></i>
+      <i class="pulse" aria-hidden="true"></i>
+      <i class="scan" aria-hidden="true"></i>
+    </section>
+
+    <section class="timeline" aria-label="动画时间轴">
+      <div class="timeline-bar" role="progressbar" aria-label="动画进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="timeline-progress" id="progress"></div>
+      </div>
+      <div class="timeline-ticks">
+        <button type="button" data-time="0">00:00<br>DETECT</button>
+        <button type="button" data-time="2">00:02<br>ROUTE</button>
+        <button type="button" data-time="4">00:04<br>SHIFT</button>
+        <button type="button" data-time="6">00:06<br>STABLE</button>
+      </div>
+    </section>
+
+    <div class="controls">
+      <p class="scene-copy" id="copy"><strong>检测异常：</strong>晚高峰节点出现局部压力，系统开始寻找可迁移的负荷路径。</p>
+      <div class="control-group">
+        <button type="button" id="playPause">暂停</button>
+        <button type="button" id="replay">重播</button>
+      </div>
+    </div>
+  </main>
+  <script>
+    const duration = 6;
+    const scenes = [
+      { start: 0, label: 'SCENE 01 / DETECT', readout: 'LOAD 74% // STABLE', copy: '<strong>检测异常：</strong>晚高峰节点出现局部压力，系统开始寻找可迁移的负荷路径。' },
+      { start: 1.7, label: 'SCENE 02 / ROUTE', readout: 'PATH 02 // OPEN', copy: '<strong>打开路径：</strong>可用线路被扫描并标记，信息以方向和亮度传递。' },
+      { start: 3.2, label: 'SCENE 03 / SHIFT', readout: 'SHIFT +18MW // LIVE', copy: '<strong>迁移负荷：</strong>数据包沿备用线路移动，压力从单点扩散到网络。' },
+      { start: 5, label: 'SCENE 04 / STABLE', readout: 'LOAD 58% // STABLE', copy: '<strong>恢复稳定：</strong>负荷完成错峰，系统保留一条可回看的因果链。' }
+    ];
+    const stage = document.querySelector('#stage');
+    const progress = document.querySelector('#progress');
+    const progressBar = document.querySelector('[role="progressbar"]');
+    const sceneLabel = document.querySelector('#sceneLabel');
+    const readout = document.querySelector('#readout');
+    const copy = document.querySelector('#copy');
+    const playPause = document.querySelector('#playPause');
+    let elapsed = 0;
+    let playing = true;
+    let last = performance.now();
+
+    function updateScene() {
+      const current = [...scenes].reverse().find(scene => elapsed >= scene.start) || scenes[0];
+      const percent = Math.min(100, (elapsed / duration) * 100);
+      progress.style.width = `${percent}%`;
+      progressBar.setAttribute('aria-valuenow', String(Math.round(percent)));
+      sceneLabel.textContent = current.label;
+      readout.textContent = current.readout;
+      copy.innerHTML = current.copy;
+    }
+
+    function frame(now) {
+      if (playing) {
+        elapsed += (now - last) / 1000;
+        if (elapsed > duration) elapsed = 0;
+        updateScene();
+      }
+      last = now;
+      requestAnimationFrame(frame);
+    }
+
+    playPause.addEventListener('click', () => {
+      playing = !playing;
+      stage.classList.toggle('is-paused', !playing);
+      playPause.textContent = playing ? '暂停' : '播放';
+      playPause.setAttribute('aria-pressed', String(!playing));
+    });
+
+    document.querySelector('#replay').addEventListener('click', () => {
+      elapsed = 0;
+      playing = true;
+      stage.classList.remove('is-paused');
+      playPause.textContent = '暂停';
+      updateScene();
+    });
+
+    document.querySelectorAll('[data-time]').forEach(button => {
+      button.addEventListener('click', () => {
+        elapsed = Number(button.dataset.time);
+        playing = false;
+        stage.classList.add('is-paused');
+        playPause.textContent = '播放';
+        updateScene();
+      });
+    });
+
+    window.addEventListener('keydown', event => {
+      if (event.target.matches('button')) return;
+      if (event.key === ' ') { event.preventDefault(); playPause.click(); }
+      if (event.key === 'ArrowLeft') elapsed = Math.max(0, elapsed - .5);
+      if (event.key === 'ArrowRight') elapsed = Math.min(duration, elapsed + .5);
+      updateScene();
+    });
+
+    updateScene();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

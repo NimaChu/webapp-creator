@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Design"
+  short_description: "Build portable HTML deliverables with reusable style systems."
+  default_prompt: "Use $html-design to build a polished portable HTML marketing artifact, prototype, infographic, motion piece, document, app, game, or presentation that runs locally."

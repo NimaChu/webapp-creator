@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23176b5e'/%3E%3C/svg%3E">
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --bg: #eef2f2; --surface: #fff; --text: #172322; --muted: #667472;
+      --line: #d2dcda; --accent: #176b5e; --accent-dark: #105248; --soft: #edf7f4;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 52px; }
+    header { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 18px; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 4vw, 2.3rem); }
+    .summary { max-width: 58ch; margin: 8px 0 0; color: var(--muted); }
+    .health { padding: 7px 10px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 0.82rem; }
+    .layout { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); border: 1px solid var(--line); background: var(--surface); }
+    .panel { min-width: 0; padding: 20px; }
+    .panel + .panel { border-left: 1px solid var(--line); }
+    h2 { margin: 0 0 14px; font-size: 1rem; }
+    .field { display: grid; gap: 7px; margin-bottom: 15px; }
+    label { font-size: 0.85rem; font-weight: 750; }
+    select, textarea, input[type="file"] {
+      width: 100%; border: 1px solid var(--line); border-radius: 6px; background: #fbfcfc; color: inherit; font: inherit;
+    }
+    select { min-height: 42px; padding: 0 10px; }
+    textarea { min-height: 260px; padding: 12px; resize: vertical; line-height: 1.55; }
+    input[type="file"] { padding: 9px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    button {
+      min-height: 42px; padding: 0 15px; border: 1px solid var(--line); border-radius: 6px;
+      background: #fff; color: inherit; font: inherit; font-weight: 750; cursor: pointer;
+    }
+    button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+    button.primary:hover { background: var(--accent-dark); }
+    button:disabled { cursor: not-allowed; opacity: 0.46; }
+    button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid rgba(14, 111, 169, 0.3); outline-offset: 2px; }
+    .output { min-height: 386px; margin: 0; padding: 15px; overflow-wrap: anywhere; white-space: pre-wrap; border: 1px solid var(--line); border-radius: 6px; background: var(--soft); line-height: 1.6; }
+    .image-output { display: grid; min-height: 386px; place-items: center; border: 1px solid var(--line); background: #f7f9f8; }
+    .image-output[hidden], .output[hidden] { display: none; }
+    .image-output img { display: block; max-width: 100%; max-height: 520px; object-fit: contain; }
+    .status { min-height: 25px; margin: 12px 0 0; color: var(--muted); font-size: 0.88rem; }
+    .config-note { margin: 14px 0 0; padding: 11px; border-left: 3px solid var(--accent); background: var(--soft); color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+    code { color: var(--text); }
+    @media (max-width: 760px) {
+      main { width: min(100% - 20px, 680px); padding-top: 18px; }
+      header { align-items: start; flex-direction: column; }
+      .layout { grid-template-columns: 1fr; }
+      .panel + .panel { border-left: 0; border-top: 1px solid var(--line); }
+      textarea { min-height: 190px; }
+      .output, .image-output { min-height: 260px; }
+    }
+    __STYLE_CSS__
+  </style>
+</head>
+<body data-webapp-kind="__KIND__" data-deliverable-type="__DELIVERABLE__" data-style="__STYLE_ID__" data-ai-capabilities="__AI_CAPABILITIES__">
+  <main>
+    <header>
+      <div>
+        <h1>__TITLE__</h1>
+        <p class="summary">__SUMMARY__</p>
+      </div>
+      <span class="health" id="health">正在检查本地模型…</span>
+    </header>
+    <section class="layout">
+      <div class="panel">
+        <h2>输入</h2>
+        <div class="field">
+          <label for="mode">任务类型</label>
+          <select id="mode">
+            <option value="chat">文本 / 代码 / 图像理解</option>
+            <option value="image">生成图片</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="prompt">指令</label>
+          <textarea id="prompt" placeholder="清楚描述希望模型完成的任务"></textarea>
+        </div>
+        <div class="field" id="fileField">
+          <label for="fileInput">参考图片（可选）</label>
+          <input id="fileInput" type="file" accept="image/*">
+        </div>
+        <div class="actions">
+          <button class="primary" id="runButton" type="button">运行</button>
+          <button id="cancelButton" type="button" disabled>取消</button>
+          <button id="resetButton" type="button">重置</button>
+        </div>
+        <p class="config-note">模型由本机配置提供。复制示例为 <code>.webapp.local.json</code>，再用技能附带的本地服务器打开应用。</p>
+      </div>
+      <div class="panel">
+        <h2>结果</h2>
+        <pre class="output" id="textOutput" aria-live="polite">等待输入。</pre>
+        <div class="image-output" id="imageOutput" hidden>
+          <img id="generatedImage" alt="模型生成结果">
+        </div>
+        <div class="actions" style="margin-top: 12px">
+          <button id="copyButton" type="button" disabled>复制文本</button>
+          <button id="downloadButton" type="button" disabled>下载图片</button>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+  <script>
+    const capabilities = new Set(document.body.dataset.aiCapabilities.split(','));
+    const mode = document.querySelector('#mode');
+    const promptInput = document.querySelector('#prompt');
+    const fileInput = document.querySelector('#fileInput');
+    const fileField = document.querySelector('#fileField');
+    const textOutput = document.querySelector('#textOutput');
+    const imageOutput = document.querySelector('#imageOutput');
+    const generatedImage = document.querySelector('#generatedImage');
+    const status = document.querySelector('#status');
+    const runButton = document.querySelector('#runButton');
+    const cancelButton = document.querySelector('#cancelButton');
+    const copyButton = document.querySelector('#copyButton');
+    const downloadButton = document.querySelector('#downloadButton');
+    let controller;
+    let currentImageUrl = '';
+
+    function availableModes() {
+      const chat = ['text', 'vision', 'code'].some(item => capabilities.has(item));
+      const image = capabilities.has('image');
+      mode.querySelector('[value="chat"]').hidden = !chat;
+      mode.querySelector('[value="image"]').hidden = !image;
+      mode.value = chat ? 'chat' : 'image';
+      mode.disabled = !(chat && image);
+      updateMode();
+    }
+
+    function updateMode() {
+      fileField.hidden = mode.value !== 'chat' || !capabilities.has('vision');
+      textOutput.hidden = mode.value !== 'chat';
+      imageOutput.hidden = mode.value !== 'image';
+      copyButton.hidden = mode.value !== 'chat';
+      downloadButton.hidden = mode.value !== 'image';
+    }
+
+    async function fileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function textFromChoice(choice) {
+      const value = choice?.delta?.content ?? choice?.message?.content ?? choice?.text ?? '';
+      if (typeof value === 'string') return value;
+      if (Array.isArray(value)) {
+        return value.map(part => typeof part === 'string' ? part : part?.text || '').join('');
+      }
+      return '';
+    }
+
+    function applyChatPayload(payload, append = false) {
+      if (payload?.error) {
+        const message = typeof payload.error === 'string' ? payload.error : payload.error.message;
+        throw new Error(message || '本地模型请求失败。');
+      }
+      const value = textFromChoice(payload?.choices?.[0]);
+      if (value) {
+        textOutput.textContent = append ? textOutput.textContent + value : value;
+        copyButton.disabled = false;
+      }
+      return value;
+    }
+
+    async function responseError(response) {
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const payload = await response.json();
+        const error = payload?.error;
+        return typeof error === 'string' ? error : error?.message || '本地模型请求失败。';
+      }
+      return (await response.text()).trim() || '本地模型请求失败。';
+    }
+
+    async function readChatStream(response) {
+      if (!response.body) throw new Error('浏览器不支持流式响应。');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let received = false;
+
+      function consumeEvent(block) {
+        const data = block
+          .split(/\r?\n/)
+          .filter(line => line.startsWith('data:'))
+          .map(line => line.slice(5).trimStart())
+          .join('\n')
+          .trim();
+        if (!data || data === '[DONE]') return;
+        let payload;
+        try {
+          payload = JSON.parse(data);
+        } catch {
+          throw new Error('模型返回了无法解析的流式数据。');
+        }
+        const value = applyChatPayload(payload, true);
+        if (value) {
+          received = true;
+          status.textContent = '正在生成…';
+        }
+      }
+
+      while (true) {
+        const { value, done } = await reader.read();
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+        const blocks = buffer.split(/\r?\n\r?\n/);
+        buffer = blocks.pop() || '';
+        blocks.forEach(consumeEvent);
+        if (done) break;
+      }
+      if (buffer.trim()) consumeEvent(buffer);
+      if (!received) throw new Error('模型没有返回文本。');
+    }
+
+    async function runChat(prompt) {
+      const file = fileInput.files[0];
+      let content = prompt;
+      if (file) {
+        content = [
+          { type: 'text', text: prompt },
+          { type: 'image_url', image_url: { url: await fileAsDataUrl(file) } }
+        ];
+      }
+      const response = await fetch('/runtime/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: [{ role: 'user', content }],
+          temperature: 0.4,
+          stream: true
+        })
+      });
+      if (!response.ok) throw new Error(await responseError(response));
+      textOutput.textContent = '';
+      copyButton.disabled = true;
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/event-stream')) {
+        await readChatStream(response);
+        return;
+      }
+      const payload = await response.json();
+      if (!applyChatPayload(payload)) throw new Error('模型没有返回文本。');
+    }
+
+    async function runImage(prompt) {
+      const response = await fetch('/runtime/ai/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({ prompt, size: '1024x1024', response_format: 'b64_json' })
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || '本地图片模型请求失败。');
+      const item = payload?.data?.[0];
+      if (!item) throw new Error('模型没有返回图片。');
+      if (currentImageUrl.startsWith('blob:')) URL.revokeObjectURL(currentImageUrl);
+      currentImageUrl = item.b64_json ? `data:image/png;base64,${item.b64_json}` : item.url;
+      generatedImage.src = currentImageUrl;
+      downloadButton.disabled = !currentImageUrl;
+    }
+
+    async function run() {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        status.textContent = '请先输入指令。';
+        promptInput.focus();
+        return;
+      }
+      controller = new AbortController();
+      runButton.disabled = true;
+      cancelButton.disabled = false;
+      status.textContent = '正在运行…';
+      try {
+        if (mode.value === 'chat') await runChat(prompt);
+        else await runImage(prompt);
+        status.textContent = '完成。';
+      } catch (error) {
+        status.textContent = error.name === 'AbortError' ? '已取消。' : error.message;
+      } finally {
+        runButton.disabled = false;
+        cancelButton.disabled = true;
+      }
+    }
+
+    runButton.addEventListener('click', run);
+    cancelButton.addEventListener('click', () => controller?.abort());
+    mode.addEventListener('change', updateMode);
+    copyButton.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(textOutput.textContent);
+      status.textContent = '已复制。';
+    });
+    downloadButton.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = currentImageUrl;
+      link.download = 'generated-image.png';
+      link.click();
+    });
+    document.querySelector('#resetButton').addEventListener('click', () => {
+      promptInput.value = '';
+      fileInput.value = '';
+      textOutput.textContent = '等待输入。';
+      copyButton.disabled = true;
+      downloadButton.disabled = true;
+      status.textContent = '';
+      promptInput.focus();
+    });
+    fetch('/runtime/health')
+      .then(response => response.json())
+      .then(data => {
+        const hasChat = ['text', 'vision', 'code'].some(item => capabilities.has(item));
+        const models = [
+          hasChat ? data.chat?.model : '',
+          capabilities.has('image') ? data.image?.model : ''
+        ].filter(Boolean);
+        document.querySelector('#health').textContent = models.length ? `本地模型：${models.join(' / ')}` : '静态模式';
+      })
+      .catch(() => {
+        document.querySelector('#health').textContent = '请使用本地服务器打开';
+      });
+    availableModes();
+  </script>
+</body>
+</html>

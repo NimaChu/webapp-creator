@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "scenarios": [
+    {
+      "id": "marketing-event-launch",
+      "name": "Event launch landing page",
+      "deliverable": "marketing",
+      "kind": "knowledge",
+      "defaultStyle": "mid-century-tactile",
+      "keywords": ["活动", "发布", "预约", "报名", "展览", "博物馆", "event", "launch", "campaign", "landing page"],
+      "composeWith": ["infographic-energy-story", "document-walkability-brief", "motion-load-shift"],
+      "template": "marketing-event-launch/index.html",
+      "contract": "A visitor understands the offer, event format, proof, and one booking action without relying on imagery.",
+      "requiredMarkers": ["data-marketing-offer", "data-marketing-proof", "data-primary-action", "预约席位"]
+    },
+    {
+      "id": "prototype-route-planner",
+      "name": "Route-planning prototype",
+      "deliverable": "prototype",
+      "kind": "guided",
+      "defaultStyle": "crafted-research",
+      "keywords": ["路线", "行程", "规划", "约束", "比较方案", "服务流程", "route", "planner", "prototype", "workflow"],
+      "composeWith": ["infographic-energy-story", "document-walkability-brief"],
+      "template": "prototype-route-planner/index.html",
+      "contract": "The user can set constraints, compare an explainable route, adjust a decision, and copy a testable plan.",
+      "requiredMarkers": ["data-prototype-hypothesis", "data-decision", "route-summary", "复制路线"]
+    },
+    {
+      "id": "infographic-energy-story",
+      "name": "Household energy explainer",
+      "deliverable": "infographic",
+      "kind": "dashboard",
+      "defaultStyle": "scientific-figure",
+      "keywords": ["信息图", "图解", "数据故事", "家庭用电", "用电", "能耗", "能源", "指标", "比较", "来源", "infographic", "explainer", "data story", "energy"],
+      "composeWith": ["marketing-event-launch", "prototype-route-planner", "document-walkability-brief", "motion-load-shift"],
+      "template": "infographic-energy-story/index.html",
+      "contract": "A reader can identify the stated takeaway, units, sample-data status, source note, and a concrete next action.",
+      "requiredMarkers": ["data-infographic-takeaway", "data-unit", "data-sample-data", "来源与方法", "可行动机会"]
+    },
+    {
+      "id": "document-walkability-brief",
+      "name": "Walkability research brief",
+      "deliverable": "document",
+      "kind": "knowledge",
+      "defaultStyle": "soft-editorial",
+      "keywords": ["报告", "文档", "研究", "简报", "指南", "证据", "建议", "可步行", "document", "report", "brief", "guide"],
+      "composeWith": ["marketing-event-launch", "prototype-route-planner", "infographic-energy-story"],
+      "template": "document-walkability-brief/index.html",
+      "contract": "A reader can scan the finding, evidence, recommendation, source note, and print-ready outline.",
+      "requiredMarkers": ["data-document-outline", "证据摘录", "建议", "来源与局限", "@media print"]
+    },
+    {
+      "id": "motion-load-shift",
+      "name": "Grid-load motion explainer",
+      "deliverable": "motion",
+      "kind": "motion",
+      "defaultStyle": "retro-system",
+      "keywords": ["动画", "动效", "动态", "时间变化", "因果过程", "负荷转移", "motion", "animation", "animated", "timeline"],
+      "composeWith": ["marketing-event-launch", "infographic-energy-story"],
+      "template": "../starters/motion/index.html",
+      "contract": "A continuous animated element explains a four-scene causal sequence with playback, seeking, and reduced-motion access.",
+      "requiredMarkers": ["data-motion-story", "requestAnimationFrame", "prefers-reduced-motion", "playPause", "replay"]
+    },
+    {
+      "id": "game-last-train-dispatch",
+      "name": "Last-train dispatch game",
+      "deliverable": "game",
+      "kind": "game",
+      "defaultStyle": "pixel-arcade",
+      "keywords": ["游戏", "玩法", "计分", "闯关", "调度", "末班车", "game", "arcade", "score", "play"],
+      "composeWith": ["marketing-event-launch", "motion-load-shift"],
+      "template": "game-last-train-dispatch/index.html",
+      "contract": "A player dispatches the final train by reading a passenger request, selecting a matching platform signal, seeing immediate state feedback, and reaching a clear success or failure result.",
+      "requiredMarkers": ["data-game-objective", "data-game-state", "data-game-restart", "12 次正确调度", "localStorage"]
+    }
+  ]
+}

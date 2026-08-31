@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__TITLE__</title>
+  <style>
+    :root { --bg:#DCCFAF; --surface:#F4E8CA; --text:#25314A; --muted:#6D6759; --accent:#D94A34; --secondary:#2F66A5; --line:#A89C7F; --display-font:"Arial Black",Arial,sans-serif; --body-font:Arial,sans-serif; }
+    * { box-sizing:border-box; } body { margin:0; color:var(--text); background:var(--bg); font-family:var(--body-font); } button { font:inherit; } a { color:inherit; }
+    .wrap { width:min(1120px,calc(100% - 32px)); margin:auto; } .nav { display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:2px solid var(--text); } .mark { font-weight:900; letter-spacing:.08em; } .nav a,.cta { padding:12px 18px; border:2px solid var(--text); background:var(--accent); color:white; text-decoration:none; font-weight:800; box-shadow:5px 5px 0 var(--text); } .nav a:focus-visible,.cta:focus-visible { outline:3px solid var(--secondary); outline-offset:4px; }
+    .hero { display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:center; padding:72px 0 56px; } .eyebrow { margin:0 0 14px; color:var(--accent); font-weight:900; letter-spacing:.12em; } h1 { margin:0; font:clamp(3rem,8vw,7rem)/.88 var(--display-font); letter-spacing:-.08em; text-transform:uppercase; } .lede { max-width:52ch; font-size:1.15rem; line-height:1.65; } .hero-figure { min-height:390px; position:relative; overflow:hidden; background:var(--secondary); border:2px solid var(--text); box-shadow:12px 12px 0 var(--text); } .sun { position:absolute; width:250px; aspect-ratio:1; right:-48px; top:-45px; border-radius:50%; background:var(--secondary); border:28px solid var(--surface); } .arch { position:absolute; width:270px; height:330px; left:52px; bottom:-32px; border:30px solid var(--accent); border-bottom:0; border-radius:150px 150px 0 0; } .ticket { position:absolute; left:35px; bottom:35px; padding:18px; color:var(--text); background:var(--surface); border:2px solid var(--text); transform:rotate(-5deg); font-weight:900; }
+    .proof { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:2px solid var(--text); } .proof article { min-height:150px; padding:24px; border-right:2px solid var(--text); background:var(--surface); } .proof article:last-child { border-right:0; } .proof strong { display:block; margin-bottom:8px; font-size:1.2rem; } .proof p { margin:0; color:var(--muted); line-height:1.5; }
+    .program { padding:72px 0; } .program h2 { margin:0 0 25px; font:clamp(2rem,5vw,4.5rem)/.95 var(--display-font); } .program-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--text); border:2px solid var(--text); } .program article { padding:26px; background:var(--surface); } .program span { color:var(--accent); font-weight:900; } .program h3 { margin:7px 0; font-size:1.4rem; } .program p { margin:0; line-height:1.6; }
+    .action { display:flex; align-items:center; justify-content:space-between; gap:26px; margin-bottom:56px; padding:36px; color:var(--surface); background:var(--text); } .action h2 { margin:0; font:clamp(2rem,4vw,3.5rem)/.95 var(--display-font); } .action .cta { white-space:nowrap; }
+    @media(max-width:720px){ .hero,.program-grid { grid-template-columns:1fr; } .proof { grid-template-columns:1fr; } .proof article { border-right:0; border-bottom:2px solid var(--text); } .proof article:last-child { border-bottom:0; } .action { align-items:flex-start; flex-direction:column; } }
+    __STYLE_CSS__
+  </style>
+</head>
+<body data-webapp-kind="__KIND__" data-deliverable-type="__DELIVERABLE__" data-style="__STYLE_ID__" data-scenario="__SCENARIO__" data-ai-capabilities="__AI_CAPABILITIES__">
+  <main class="wrap">
+    <nav class="nav" aria-label="页面导航"><span class="mark">NIGHT / MUSEUM</span><a href="#reserve">预约</a></nav>
+    <section class="hero" data-marketing-offer>
+      <div><p class="eyebrow">每周五与周六 · 夜间特别开放</p><h1>__TITLE__</h1><p class="lede">__SUMMARY__</p><a class="cta" href="#reserve" data-primary-action>预约席位</a></div>
+      <div class="hero-figure" aria-label="夜游活动的抽象海报"><i class="sun" aria-hidden="true"></i><i class="arch" aria-hidden="true"></i><span class="ticket">18:30-22:00<br>GUIDED NIGHT WALK</span></div>
+    </section>
+    <section class="proof" data-marketing-proof aria-label="为什么参加"><article><strong>只在夜晚发生</strong><p>展厅灯光、声音与讲解按夜游动线重新编排。</p></article><article><strong>小组而非赶场</strong><p>每场围绕一个展区停留、讨论和自由观察。</p></article><article><strong>可带走的路线</strong><p>结束后获得一份城市夜行地图，延续当晚的发现。</p></article></section>
+    <section class="program"><h2>一晚，三次转场。</h2><div class="program-grid"><article><span>18:30</span><h3>在门厅集合</h3><p>领取夜游折页，选择安静观察或讲解同行。</p></article><article><span>19:15</span><h3>进入特别展厅</h3><p>以一件作品为线索，连接城市记忆与当下生活。</p></article><article><span>20:30</span><h3>露台短暂停留</h3><p>用城市天际线完成当晚的最后一段观看。</p></article><article><span>21:10</span><h3>带路线离场</h3><p>把感兴趣的街区、书店和夜间空间标记到个人地图。</p></article></div></section>
+    <section class="action" id="reserve"><div><p class="eyebrow">准备好了吗</p><h2>把周末的一晚，留给城市。</h2></div><a class="cta" href="mailto:reserve@example.test">预约席位</a></section>
+  </main>
+</body>
+</html>

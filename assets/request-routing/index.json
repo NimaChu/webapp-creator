@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "deliverableSignals": {
+    "application": ["工具", "仪表盘", "控制台", "表单", "知识库", "tool", "dashboard", "app"],
+    "marketing": ["营销", "活动", "发布", "落地页", "转化", "报名", "预约", "campaign", "launch", "landing page", "marketing"],
+    "prototype": ["原型", "概念验证", "流程验证", "可用性测试", "prototype", "proof of concept", "workflow test"],
+    "infographic": ["信息图", "图解", "数据故事", "视觉解释", "infographic", "explainer", "data story"],
+    "motion": ["动画", "动效", "动态叙事", "motion", "animation", "animated"],
+    "document": ["文档", "报告", "简报", "指南", "手册", "document", "report", "brief", "guide", "manual"],
+    "game": ["游戏", "玩法", "闯关", "game", "arcade"],
+    "presentation": ["演示", "幻灯片", "路演", "ppt", "presentation", "slides"]
+  },
+  "kindSignals": {
+    "tool": ["计算器", "生成器", "转换器", "检查器", "工具", "calculator", "generator", "converter", "tool"],
+    "dashboard": ["仪表盘", "指标", "趋势", "筛选", "监控", "dashboard", "metrics", "trend"],
+    "guided": ["分步", "向导", "配置", "诊断", "表单流程", "guided", "wizard", "step-by-step"],
+    "knowledge": ["知识", "指南", "文章", "报告", "faq", "knowledge", "guide", "document"],
+    "game": ["游戏", "玩法", "得分", "闯关", "game", "score", "play"],
+    "presentation": ["演示", "幻灯片", "路演", "ppt", "presentation", "slides"],
+    "motion": ["动画", "动效", "播放", "时间轴", "motion", "animation", "timeline"]
+  },
+  "genericScenarioTerms": [
+    "活动", "发布", "预约", "报名", "event", "launch", "campaign", "landing page",
+    "原型", "服务流程", "prototype", "workflow",
+    "信息图", "图解", "数据故事", "指标", "比较", "来源", "infographic", "explainer", "data story",
+    "报告", "文档", "研究", "简报", "指南", "证据", "建议", "document", "report", "brief", "guide",
+    "动画", "动效", "动态", "时间变化", "因果过程", "motion", "animation", "animated", "timeline",
+    "游戏", "玩法", "计分", "闯关", "game", "arcade", "score", "play"
+  ],
+  "compositionSignals": ["同时", "并且", "结合", "以及", "既", "又", " + ", " with ", " and "],
+  "schemeSignals": {
+    "dark": ["深色", "暗色", "黑底", "夜间模式", "dark", "night mode"],
+    "light": ["浅色", "明亮", "白底", "light", "bright"]
+  },
+  "dials": {
+    "defaults": {"variance": 5, "motion": 4, "density": 5},
+    "varianceHigh": {"target": 8, "signals": ["实验", "先锋", "大胆", "游戏", "街机", "experimental", "bold", "playful"]},
+    "varianceLow": {"target": 3, "signals": ["克制", "极简", "严肃", "机构", "minimal", "restrained", "institutional"]},
+    "motionHighKinds": ["motion"],
+    "motionHighDeliverables": ["motion"],
+    "motionHighTarget": 9,
+    "motionMedium": {"target": 7, "signals": ["动效", "动态", "过渡", "interactive", "transition"]},
+    "motionLow": {"target": 1, "signals": ["静态", "打印", "无动画", "static", "print", "no animation"]},
+    "densityHighKinds": ["dashboard"],
+    "densityHigh": {"target": 8, "signals": ["密集", "大量数据", "dense", "data-heavy"]},
+    "densityLow": {"target": 3, "signals": ["留白", "轻盈", "稀疏", "spacious", "airy", "sparse"]}
+  }
+}
